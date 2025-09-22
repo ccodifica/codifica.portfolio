@@ -57,19 +57,54 @@ const HeroSection = () => {
             </Link>
           </div>
 
-          {/* Stats */}
-          <div className="text-reveal grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 pt-16 border-t border-border/50">
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-2">50+</div>
-              <div className="text-muted-foreground">Projetos Entregues</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-accent mb-2">98%</div>
-              <div className="text-muted-foreground">Satisfação do Cliente</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-success mb-2">24/7</div>
-              <div className="text-muted-foreground">Suporte Técnico</div>
+          {/* Portfolio Carousel */}
+          <div className="text-reveal mt-16 pt-16 border-t border-border/50">
+            <div className="relative overflow-hidden">
+              <div className="flex animate-scroll-left space-x-6">
+                <div className="flex-shrink-0 w-64 h-40 rounded-lg overflow-hidden bg-card/30 border border-border/30">
+                  <img 
+                    src="/src/assets/project-ecommerce.jpg" 
+                    alt="Projeto E-commerce" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex-shrink-0 w-64 h-40 rounded-lg overflow-hidden bg-card/30 border border-border/30">
+                  <img 
+                    src="/src/assets/project-delivery.jpg" 
+                    alt="Sistema de Delivery" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex-shrink-0 w-64 h-40 rounded-lg overflow-hidden bg-card/30 border border-border/30">
+                  <img 
+                    src="/src/assets/project-erp.jpg" 
+                    alt="Sistema ERP" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                {/* Duplicate for seamless loop */}
+                <div className="flex-shrink-0 w-64 h-40 rounded-lg overflow-hidden bg-card/30 border border-border/30">
+                  <img 
+                    src="/src/assets/project-ecommerce.jpg" 
+                    alt="Projeto E-commerce" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex-shrink-0 w-64 h-40 rounded-lg overflow-hidden bg-card/30 border border-border/30">
+                  <img 
+                    src="/src/assets/project-delivery.jpg" 
+                    alt="Sistema de Delivery" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex-shrink-0 w-64 h-40 rounded-lg overflow-hidden bg-card/30 border border-border/30">
+                  <img 
+                    src="/src/assets/project-erp.jpg" 
+                    alt="Sistema ERP" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
