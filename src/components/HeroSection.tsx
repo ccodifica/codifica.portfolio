@@ -57,78 +57,55 @@ const HeroSection = () => {
             </Link>
           </div>
 
-          {/* Portfolio Carousel Introduction */}
+          {/* Portfolio Carousel */}
           <div className="text-reveal mt-16 pt-16 border-t border-border/50">
-            <h3 className="text-2xl font-semibold text-center mb-8 text-muted-foreground">
-              Alguns dos nossos projetos
-            </h3>
-          </div>
-        </div>
-      </div>
-
-      {/* Full Width Portfolio Carousel - Outside container */}
-      <div className="text-reveal relative w-full overflow-hidden mt-8">
-        {/* Fade overlays */}
-        <div className="absolute left-0 top-0 w-32 h-full bg-gradient-to-r from-background via-background/80 to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 w-32 h-full bg-gradient-to-l from-background via-background/80 to-transparent z-10 pointer-events-none" />
-        
-        <div className="flex animate-scroll-left space-x-6 py-4">
-          <div className="flex-shrink-0 w-80 h-48 rounded-2xl overflow-hidden bg-card/20 border border-border/20 shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <img 
-              src="/src/assets/project-ecommerce.jpg" 
-              alt="Projeto E-commerce" 
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="flex-shrink-0 w-80 h-48 rounded-2xl overflow-hidden bg-card/20 border border-border/20 shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <img 
-              src="/src/assets/project-delivery.jpg" 
-              alt="Sistema de Delivery" 
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="flex-shrink-0 w-80 h-48 rounded-2xl overflow-hidden bg-card/20 border border-border/20 shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <img 
-              src="/src/assets/project-erp.jpg" 
-              alt="Sistema ERP" 
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="flex-shrink-0 w-80 h-48 rounded-2xl overflow-hidden bg-card/20 border border-border/20 shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <img 
-              src="/src/assets/project-ecommerce.jpg" 
-              alt="Projeto E-commerce (cópia)" 
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="flex-shrink-0 w-80 h-48 rounded-2xl overflow-hidden bg-card/20 border border-border/20 shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <img 
-              src="/src/assets/project-delivery.jpg" 
-              alt="Sistema de Delivery (cópia)" 
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="flex-shrink-0 w-80 h-48 rounded-2xl overflow-hidden bg-card/20 border border-border/20 shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <img 
-              src="/src/assets/project-erp.jpg" 
-              alt="Sistema ERP (cópia)" 
-              className="w-full h-full object-cover"
-            />
-          </div>
-          {/* Additional duplicates for smoother infinite scroll */}
-          <div className="flex-shrink-0 w-80 h-48 rounded-2xl overflow-hidden bg-card/20 border border-border/20 shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <img 
-              src="/src/assets/project-ecommerce.jpg" 
-              alt="Projeto E-commerce" 
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="flex-shrink-0 w-80 h-48 rounded-2xl overflow-hidden bg-card/20 border border-border/20 shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <img 
-              src="/src/assets/project-delivery.jpg" 
-              alt="Sistema de Delivery" 
-              className="w-full h-full object-cover"
-            />
+            <div className="relative overflow-hidden">
+              <div className="flex animate-scroll-left space-x-6">
+                <div className="flex-shrink-0 w-64 h-40 rounded-lg overflow-hidden bg-card/30 border border-border/30">
+                  <img 
+                    src="/src/assets/project-ecommerce.jpg" 
+                    alt="Projeto E-commerce" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex-shrink-0 w-64 h-40 rounded-lg overflow-hidden bg-card/30 border border-border/30">
+                  <img 
+                    src="/src/assets/project-delivery.jpg" 
+                    alt="Sistema de Delivery" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex-shrink-0 w-64 h-40 rounded-lg overflow-hidden bg-card/30 border border-border/30">
+                  <img 
+                    src="/src/assets/project-erp.jpg" 
+                    alt="Sistema ERP" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                {/* Duplicate for seamless loop */}
+                <div className="flex-shrink-0 w-64 h-40 rounded-lg overflow-hidden bg-card/30 border border-border/30">
+                  <img 
+                    src="/src/assets/project-ecommerce.jpg" 
+                    alt="Projeto E-commerce" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex-shrink-0 w-64 h-40 rounded-lg overflow-hidden bg-card/30 border border-border/30">
+                  <img 
+                    src="/src/assets/project-delivery.jpg" 
+                    alt="Sistema de Delivery" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex-shrink-0 w-64 h-40 rounded-lg overflow-hidden bg-card/30 border border-border/30">
+                  <img 
+                    src="/src/assets/project-erp.jpg" 
+                    alt="Sistema ERP" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
