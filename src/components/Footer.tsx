@@ -47,7 +47,12 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-3 text-muted-foreground">
                 <Mail className="w-5 h-5 text-primary" />
-                <span>ccodifica@gmail.com</span>
+                <a
+                  href="mailto:ccodifica@gmail.com"
+                  className="hover:text-primary transition-colors duration-300"
+                >
+                  ccodifica@gmail.com
+                </a>
               </div>
               <div className="flex items-center space-x-3 text-muted-foreground">
                 <WhatsAppIcon className="w-5 h-5 text-primary" />

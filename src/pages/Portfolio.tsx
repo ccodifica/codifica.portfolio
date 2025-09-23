@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,6 +14,21 @@ const Portfolio = () => {
   const [selectedFilter, setSelectedFilter] = useState("Todos");
   const [isVisible, setIsVisible] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const navigate = useNavigate();
+
+  const handleContactClick = () => {
+    navigate('/');
+    // Wait for navigation to complete, then scroll to contact
+    setTimeout(() => {
+      const contactElement = document.getElementById('contact');
+      if (contactElement) {
+        contactElement.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    }, 100);
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100);
@@ -202,15 +218,7 @@ const Portfolio = () => {
               Vamos conversar sobre como podemos transformar sua ideia em realidade com soluções sob medida.
             </p>
             <Button 
-              onClick={() => {
-                const contact = document.getElementById("contact");
-                if (contact) {
-                  contact.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start",
-                  });
-                }
-              }}
+              onClick={handleContactClick}
               className="bg-gradient-primary hover:bg-gradient-secondary text-primary-foreground font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
             >
               Faça seu orçamento

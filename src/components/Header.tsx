@@ -23,6 +23,18 @@ const Header = () => {
     setIsMenuOpen(false); // Fecha o menu mobile se estiver aberto
   };
 
+  const handleLogoClick = (e: React.MouseEvent) => {
+    // Se já estamos na página inicial, rola para o topo
+    if (location.pathname === '/') {
+      e.preventDefault();
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+    }
+    // Se não estamos na página inicial, o Link normal funciona (vai para home)
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -51,6 +63,7 @@ const Header = () => {
           {/* Logo */}
           <Link
             to="/"
+            onClick={handleLogoClick}
             className="flex items-center space-x-2 text-2xl font-bold text-foreground hover:text-primary transition-colors duration-300"
           >
             <Code className="w-8 h-8 text-primary" />
