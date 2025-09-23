@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Users, Target, Award, Code2 } from "lucide-react";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const Sobre = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -41,6 +43,7 @@ const Sobre = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Header />
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,_hsl(262_100%_58%_/_0.1),_transparent_50%)] animate-pulse" />
@@ -198,16 +201,23 @@ const Sobre = () => {
               empresa a alcançar o próximo nível através da tecnologia.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+              <button 
+                onClick={() => {
+                  // Navigate to home page and scroll to contact section
+                  window.location.href = "/#contact";
+                }}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+              >
                 Fale Conosco
               </button>
               <button className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-medium px-6 py-3 rounded-lg transition-all duration-300">
-                Ver Portfólio
+                Ver Projetos
               </button>
             </div>
           </div>
         </div>
       </section>
+      <Footer />
     </div>
   );
 };

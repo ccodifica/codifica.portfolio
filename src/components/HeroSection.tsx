@@ -1,15 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const TypewriterText = () => {
-  const words = [
+  const words = useMemo(() => [
     "startups",
     "empreendedores",
     "equipes de produto",
     "equipes de marketing",
-  ];
+  ], []);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [currentText, setCurrentText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -126,13 +126,23 @@ const TypewriterText = () => {
 const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
 
+  const handleContactClick = () => {
+    const contact = document.getElementById("contact");
+    if (contact) {
+      contact.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  };
+
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100);
     return () => clearTimeout(timer);
   }, []);
 
   return (
-    <section className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-gradient-hero w-full">
+    <section className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-gradient-hero w-full pt-28 sm:pt-32">
       {/* Background Effects */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,_hsl(262_100%_58%_/_0.1),_transparent_50%)] animate-pulse" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,_hsl(195_100%_50%_/_0.1),_transparent_50%)] animate-pulse" />
@@ -156,7 +166,7 @@ const HeroSection = () => {
           }`}
         >
           {/* Main Heading */}
-          <h1 className="text-reveal hero-text font-manrope font-bold mb-6 text-balance leading-tight">
+          <h1 className="text-reveal hero-text text-3xl md:text-5xl lg:text-6xl font-manrope font-bold mb-6 text-center text-balance leading-tight max-w-4xl mx-auto">
             Soluções inteligentes
             <br />
             em software para o
@@ -172,7 +182,10 @@ const HeroSection = () => {
 
           {/* CTA Buttons */}
           <div className="text-reveal flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-manrope font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 group">
+            <Button 
+              onClick={handleContactClick}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-manrope font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 group"
+            >
               Fale Conosco!
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
             </Button>
@@ -181,7 +194,7 @@ const HeroSection = () => {
                 variant="outline"
                 className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-manrope font-medium px-6 py-3 rounded-lg transition-all duration-300"
               >
-                Ver Portfólio
+                Ver Projetos
               </Button>
             </Link>
           </div>
@@ -224,7 +237,7 @@ const HeroSection = () => {
           </div>
 
           {/* Animated Text Section */}
-          <div className="text-reveal mt-16 text-center px-4 sm:px-6">
+          <div className="text-reveal mt-16 mb-12 sm:mb-20 text-center px-4 sm:px-6">
             <div className="max-w-4xl mx-auto">
               <TypewriterText />
             </div>

@@ -12,11 +12,23 @@ import projectErp from "@/assets/project-erp.jpg";
 const Portfolio = () => {
   const [selectedFilter, setSelectedFilter] = useState("Todos");
   const [isVisible, setIsVisible] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100);
     return () => clearTimeout(timer);
   }, []);
+
+  // Add transition effect when filter changes
+  const handleFilterChange = (filter: string) => {
+    if (filter !== selectedFilter) {
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setSelectedFilter(filter);
+        setIsTransitioning(false);
+      }, 200);
+    }
+  };
 
   const filters = ["Todos", "Web", "Mobile", "Sistemas"];
 
@@ -90,7 +102,7 @@ const Portfolio = () => {
         <div className="container mx-auto px-4 text-center">
           <div className={`max-w-4xl mx-auto transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <h1 className="hero-text font-bold mb-6">
-              Portfólio
+              Projetos
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto text-balance">
               Confira alguns projetos desenvolvidos pela Codifica que mostram nossa capacidade de transformar ideias em software.
@@ -108,21 +120,26 @@ const Portfolio = () => {
               <Button
                 key={filter}
                 variant={selectedFilter === filter ? "default" : "outline"}
-                onClick={() => setSelectedFilter(filter)}
+                onClick={() => handleFilterChange(filter)}
                 className={`${
                   selectedFilter === filter 
-                    ? "bg-gradient-primary text-primary-foreground" 
-                    : "btn-outline-glow"
-                } group`}
+                    ? "bg-gradient-primary text-primary-foreground shadow-lg scale-105 ring-2 ring-primary/20" 
+                    : "btn-outline-glow hover:scale-105 hover:shadow-md"
+                } group transition-all duration-300 transform relative overflow-hidden`}
               >
-                <Filter className="w-4 h-4 mr-2" />
-                {filter}
+                {filter === "Todos" && <Filter className="w-4 h-4 mr-2" />}
+                <span className="relative z-10">{filter}</span>
+                {selectedFilter === filter && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent animate-pulse" />
+                )}
               </Button>
             ))}
           </div>
 
           {/* Projects Grid */}
-          <div className={`grid md:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className={`grid md:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-500 ${
+            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          } ${isTransitioning ? 'opacity-50 scale-95' : 'opacity-100 scale-100'}`}>
             {filteredProjects.map((project, index) => (
               <Card 
                 key={project.id} 
@@ -184,8 +201,19 @@ const Portfolio = () => {
             <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
               Vamos conversar sobre como podemos transformar sua ideia em realidade com soluções sob medida.
             </p>
-            <Button className="btn-hero">
-              Iniciar Projeto
+            <Button 
+              onClick={() => {
+                const contact = document.getElementById("contact");
+                if (contact) {
+                  contact.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                  });
+                }
+              }}
+              className="bg-gradient-primary hover:bg-gradient-secondary text-primary-foreground font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+            >
+              Faça seu orçamento
             </Button>
           </div>
         </div>
