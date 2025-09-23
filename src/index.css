@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;1,100;1,200;1,300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -290,20 +294,47 @@
 
   /* Typewriter Text Animation */
   .typewriter-container {
-    font-family: 'DM Serif Display', 'Benton Modern Display Extra', serif;
-    font-size: 1.6em;
-    font-style: italic;
-    letter-spacing: 0.02em;
-    line-height: 1.2;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    font-family: 'Crimson Text', 'Inter', 'Helvetica Neue', serif !important;
+    font-size: 1.6em !important;
+    font-style: italic !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.01em !important;
+    line-height: 1.2 !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  .typewriter-container * {
+    font-family: 'Crimson Text', 'Inter', 'Helvetica Neue', serif !important;
+    font-style: italic !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.01em !important;
+  }
+
+  @media (max-width: 640px) {
+    .typewriter-container {
+      flex-direction: column;
+      gap: 0.125rem;
+    }
   }
 
   .perfect-for-text {
-    font-family: 'DM Serif Display', 'Benton Modern Display Extra', serif;
-    font-size: 1.6em;
-    font-style: italic;
-    font-weight: 400;
-    letter-spacing: 0.05em;
-    color: hsl(var(--muted-foreground));
+    font-family: 'Crimson Text', 'Inter', 'Helvetica Neue', serif !important;
+    font-size: 1.6em !important;
+    font-style: italic !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.01em !important;
+    color: hsl(var(--muted-foreground)) !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    opacity: 0.8;
   }
 
   .typewriter-word-container {
@@ -312,25 +343,35 @@
     min-height: 1.5em;
     min-width: 280px;
     justify-content: flex-start;
+    margin-left: 0.3em;
   }
 
   .typewriter-text {
-    font-family: 'DM Serif Display', 'Benton Modern Display Extra', serif;
-    font-size: 1.6em;
-    font-style: italic;
-    color: #FFD700;
-    font-weight: 700;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
-    letter-spacing: 0.02em;
+    font-family: 'Crimson Text', 'Inter', 'Helvetica Neue', serif !important;
+    font-size: 1.6em !important;
+    font-style: italic !important;
+    color: #FFD700 !important;
+    font-weight: 400 !important;
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.2);
+    letter-spacing: 0.01em !important;
     white-space: nowrap;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   .typewriter-cursor {
-    color: #FFD700;
-    font-weight: 400;
+    color: hsl(var(--muted-foreground)) !important;
+    font-family: 'Crimson Text', 'Inter', 'Helvetica Neue', serif !important;
+    font-weight: 400 !important;
+    font-style: italic !important;
+    letter-spacing: 0.01em !important;
     margin-left: 2px;
     transition: opacity 0.1s ease-in-out;
     animation: cursorBlink 1s infinite;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    opacity: 0.8;
   }
 
   @keyframes cursorBlink {
