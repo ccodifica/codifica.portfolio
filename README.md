@@ -27,10 +27,10 @@ Antes de começar, certifique-se de ter o **Node.js** e o **npm** instalados.
 
 ```sh
 # 1️⃣ Clone este repositório
-git clone <URL_DO_SEU_REPOSITORIO>
+git clone <https://github.com/ccodifica/codifica.portfolio.git>
 
 # 2️⃣ Acesse a pasta do projeto
-cd <NOME_DO_PROJETO>
+cd codifica.portifolio
 
 # 3️⃣ Instale as dependências
 npm install
