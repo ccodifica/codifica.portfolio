@@ -159,7 +159,7 @@ const ContactSection = () => {
                     <p className="text-muted-foreground mb-3">Fale conosco diretamente</p>
                     <button
                       onClick={() => {
-                        const phoneNumber = "5521999999999"; // Formato: código país (55) + DDD (21) + número (999999999)
+                        const phoneNumber = "5521982998010"; // +55 21 98299-8010
                         const message = encodeURIComponent("Olá! Gostaria de saber mais sobre os serviços da Codifica.");
                         window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
                       }}

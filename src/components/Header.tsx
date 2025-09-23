@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Code } from "lucide-react";
 
@@ -7,20 +7,22 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Force header background on Sobre page
   const shouldShowBackground = isScrolled || location.pathname === '/sobre';
 
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    const contact = document.getElementById("contact");
-    if (contact) {
-      contact.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+    if (location.pathname !== '/') {
+      navigate('/', { state: { target: 'contact' } });
+    } else {
+      const contact = document.getElementById('contact');
+      if (contact) {
+        contact.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
-    setIsMenuOpen(false); // Fecha o menu mobile se estiver aberto
+    setIsMenuOpen(false);
   };
 
   const handleLogoClick = (e: React.MouseEvent) => {
@@ -76,6 +78,13 @@ const Header = () => {
               <Link
                 key={item.name}
                 to={item.path}
+                onClick={(e) => {
+                  if (location.pathname === item.path) {
+                    e.preventDefault();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                  setIsMenuOpen(false);
+                }}
                 className={`link-underline font-medium transition-colors duration-300 ${
                   location.pathname === item.path
                     ? "text-primary"
@@ -114,7 +123,13 @@ const Header = () => {
                 <Link
                   key={item.name}
                   to={item.path}
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={(e) => {
+                    if (location.pathname === item.path) {
+                      e.preventDefault();
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                    setIsMenuOpen(false);
+                  }}
                   className={`font-medium transition-colors duration-300 ${
                     location.pathname === item.path
                       ? "text-primary"

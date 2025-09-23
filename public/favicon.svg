@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" shape-rendering="geometricPrecision">
+  <title>Codifica</title>
+  <!-- Ícone <> sem fundo, versão bem aberta (gap maior entre os chevrons) -->
+  <!-- Estratégia: mover ápices internos para 26 (esquerda) e 38 (direita) criando gap de 12px -->
+  <g stroke="#6366f1" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- < (interno em 24.5) -->
+    <path d="M24.5 14 L12 32 L24.5 50" />
+    <!-- > (interno em 39.5) -->
+    <path d="M39.5 14 L52 32 L39.5 50" />
+  </g>
+</svg>
