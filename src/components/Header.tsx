@@ -10,11 +10,11 @@ const Header = () => {
 
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    const footer = document.getElementById('footer');
+    const footer = document.getElementById("footer");
     if (footer) {
-      footer.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
+      footer.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
       });
     }
     setIsMenuOpen(false); // Fecha o menu mobile se estiver aberto
@@ -57,7 +57,7 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => (
+            {navItems.map((item) =>
               item.isScroll ? (
                 <button
                   key={item.name}
@@ -79,7 +79,7 @@ const Header = () => {
                   {item.name}
                 </Link>
               )
-            ))}
+            )}
             <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 py-2 rounded-lg transition-all duration-300">
               Fale Conosco
             </Button>
@@ -90,7 +90,11 @@ const Header = () => {
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="md:hidden p-2 text-foreground hover:text-primary transition-colors duration-300"
           >
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
           </button>
         </div>
 
@@ -98,7 +102,7 @@ const Header = () => {
         {isMenuOpen && (
           <div className="md:hidden mt-4 pb-4 border-t border-border/50">
             <div className="flex flex-col space-y-4 pt-4">
-              {navItems.map((item) => (
+              {navItems.map((item) =>
                 item.isScroll ? (
                   <button
                     key={item.name}
@@ -121,7 +125,7 @@ const Header = () => {
                     {item.name}
                   </Link>
                 )
-              ))}
+              )}
               <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 py-2 rounded-lg transition-all duration-300 w-full mt-4">
                 Fale Conosco
               </Button>

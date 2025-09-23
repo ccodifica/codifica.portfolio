@@ -56,8 +56,7 @@ const TypewriterText = () => {
     alignItems: "center",
     justifyContent: "center",
     gap: "0.25rem",
-    fontFamily:
-      "'Playfair Display', 'Cormorant Garamond', 'Georgia', serif",
+    fontFamily: "'Playfair Display', 'Cormorant Garamond', 'Georgia', serif",
     fontSize: "clamp(1rem, 4vw, 1.6rem)",
     fontStyle: "italic",
     fontWeight: "300",
@@ -69,8 +68,7 @@ const TypewriterText = () => {
   };
 
   const perfectForStyle = {
-    fontFamily:
-      "'Playfair Display', 'Cormorant Garamond', 'Georgia', serif",
+    fontFamily: "'Playfair Display', 'Cormorant Garamond', 'Georgia', serif",
     fontSize: "clamp(1rem, 4vw, 1.6rem)",
     fontStyle: "italic",
     fontWeight: "300",
@@ -82,8 +80,7 @@ const TypewriterText = () => {
   };
 
   const textStyle = {
-    fontFamily:
-      "'Playfair Display', 'Cormorant Garamond', 'Georgia', serif",
+    fontFamily: "'Playfair Display', 'Cormorant Garamond', 'Georgia', serif",
     fontSize: "clamp(1rem, 4vw, 1.6rem)",
     fontStyle: "italic",
     fontWeight: "300",
@@ -95,8 +92,7 @@ const TypewriterText = () => {
   };
 
   const cursorStyle = {
-    fontFamily:
-      "'Playfair Display', 'Cormorant Garamond', 'Georgia', serif",
+    fontFamily: "'Playfair Display', 'Cormorant Garamond', 'Georgia', serif",
     fontSize: "clamp(1rem, 4vw, 1.6rem)",
     fontStyle: "italic",
     fontWeight: "300",

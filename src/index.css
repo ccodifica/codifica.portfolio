@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;1,100;1,200;1,300&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;1,100;1,200;1,300&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -48,11 +48,28 @@
     --radius: 0.75rem;
 
     /* Custom Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(262 100% 58%), hsl(292 84% 61%));
-    --gradient-secondary: linear-gradient(135deg, hsl(195 100% 50%), hsl(262 100% 58%));
-    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(195 100% 50%));
-    --gradient-hero: linear-gradient(135deg, hsl(210 11% 4%) 0%, hsl(210 11% 6%) 50%, hsl(262 100% 58% / 0.05) 100%);
-    
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(262 100% 58%),
+      hsl(292 84% 61%)
+    );
+    --gradient-secondary: linear-gradient(
+      135deg,
+      hsl(195 100% 50%),
+      hsl(262 100% 58%)
+    );
+    --gradient-success: linear-gradient(
+      135deg,
+      hsl(142 76% 36%),
+      hsl(195 100% 50%)
+    );
+    --gradient-hero: linear-gradient(
+      135deg,
+      hsl(210 11% 4%) 0%,
+      hsl(210 11% 6%) 50%,
+      hsl(262 100% 58% / 0.05) 100%
+    );
+
     /* Custom Shadows */
     --shadow-glow: 0 0 50px hsl(262 100% 58% / 0.3);
     --shadow-card: 0 25px 50px -12px hsl(210 11% 2% / 0.5);
@@ -95,13 +112,26 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    background-image: 
-      radial-gradient(circle at 20% 20%, hsl(262 100% 58% / 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, hsl(195 100% 50% / 0.1) 0%, transparent 50%);
+    font-family: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      system-ui, sans-serif;
+    background-image: radial-gradient(
+        circle at 20% 20%,
+        hsl(262 100% 58% / 0.1) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 80% 80%,
+        hsl(195 100% 50% / 0.1) 0%,
+        transparent 50%
+      );
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-semibold tracking-tight;
   }
 
@@ -121,11 +151,19 @@
 @layer components {
   /* Hero Text Effect */
   .hero-text {
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 20%, #cbd5e1 40%, #94a3b8 60%, #64748b 80%, #475569 100%);
+    background: linear-gradient(
+      135deg,
+      #f8fafc 0%,
+      #e2e8f0 20%,
+      #cbd5e1 40%,
+      #94a3b8 60%,
+      #64748b 80%,
+      #475569 100%
+    );
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    font-family: 'Manrope', sans-serif;
+    font-family: "Manrope", sans-serif;
     font-weight: 800;
     letter-spacing: -0.02em;
   }
@@ -170,8 +208,13 @@
   }
 
   @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
   }
 
   /* Pulse Glow */
@@ -180,10 +223,11 @@
   }
 
   @keyframes pulse-glow {
-    0%, 100% { 
+    0%,
+    100% {
       box-shadow: 0 0 20px hsl(262 100% 58% / 0.3);
     }
-    50% { 
+    50% {
       box-shadow: 0 0 40px hsl(262 100% 58% / 0.6);
     }
   }
@@ -216,11 +260,21 @@
   }
 
   /* Stagger delays for text reveals */
-  .text-reveal:nth-child(1) { animation-delay: 0.1s; }
-  .text-reveal:nth-child(2) { animation-delay: 0.2s; }
-  .text-reveal:nth-child(3) { animation-delay: 0.3s; }
-  .text-reveal:nth-child(4) { animation-delay: 0.4s; }
-  .text-reveal:nth-child(5) { animation-delay: 0.5s; }
+  .text-reveal:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+  .text-reveal:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .text-reveal:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  .text-reveal:nth-child(4) {
+    animation-delay: 0.4s;
+  }
+  .text-reveal:nth-child(5) {
+    animation-delay: 0.5s;
+  }
 }
 
 @layer utilities {
@@ -240,8 +294,20 @@
 
   /* Carousel mask fade on edges */
   .carousel-mask {
-    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
-    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 8%,
+      black 92%,
+      transparent
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 8%,
+      black 92%,
+      transparent
+    );
   }
 
   .carousel-track {
@@ -299,7 +365,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.25rem;
-    font-family: 'Crimson Text', 'Inter', 'Helvetica Neue', serif !important;
+    font-family: "Crimson Text", "Inter", "Helvetica Neue", serif !important;
     font-size: 1.6em !important;
     font-style: italic !important;
     font-weight: 400 !important;
@@ -311,7 +377,7 @@
   }
 
   .typewriter-container * {
-    font-family: 'Crimson Text', 'Inter', 'Helvetica Neue', serif !important;
+    font-family: "Crimson Text", "Inter", "Helvetica Neue", serif !important;
     font-style: italic !important;
     font-weight: 400 !important;
     letter-spacing: 0.01em !important;
@@ -325,7 +391,7 @@
   }
 
   .perfect-for-text {
-    font-family: 'Crimson Text', 'Inter', 'Helvetica Neue', serif !important;
+    font-family: "Crimson Text", "Inter", "Helvetica Neue", serif !important;
     font-size: 1.6em !important;
     font-style: italic !important;
     font-weight: 400 !important;
@@ -347,10 +413,10 @@
   }
 
   .typewriter-text {
-    font-family: 'Crimson Text', 'Inter', 'Helvetica Neue', serif !important;
+    font-family: "Crimson Text", "Inter", "Helvetica Neue", serif !important;
     font-size: 1.6em !important;
     font-style: italic !important;
-    color: #FFD700 !important;
+    color: #ffd700 !important;
     font-weight: 400 !important;
     text-shadow: 0 0 8px rgba(255, 215, 0, 0.2);
     letter-spacing: 0.01em !important;
@@ -362,7 +428,7 @@
 
   .typewriter-cursor {
     color: hsl(var(--muted-foreground)) !important;
-    font-family: 'Crimson Text', 'Inter', 'Helvetica Neue', serif !important;
+    font-family: "Crimson Text", "Inter", "Helvetica Neue", serif !important;
     font-weight: 400 !important;
     font-style: italic !important;
     letter-spacing: 0.01em !important;
@@ -375,10 +441,12 @@
   }
 
   @keyframes cursorBlink {
-    0%, 50% {
+    0%,
+    50% {
       opacity: 1;
     }
-    51%, 100% {
+    51%,
+    100% {
       opacity: 0;
     }
   }
@@ -390,7 +458,7 @@
       gap: 0.5rem;
       text-align: center;
     }
-    
+
     .typewriter-word-container {
       justify-content: center;
       min-width: 150px;

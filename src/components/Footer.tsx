@@ -1,5 +1,13 @@
 import { Link } from "react-router-dom";
-import { Code, Mail, Phone, MapPin, Github, Linkedin, Twitter } from "lucide-react";
+import {
+  Code,
+  Mail,
+  Phone,
+  MapPin,
+  Github,
+  Linkedin,
+  Twitter,
+} from "lucide-react";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -10,15 +18,18 @@ const Footer = () => {
         <div className="grid md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="md:col-span-2">
-            <Link to="/" className="flex items-center space-x-2 text-2xl font-bold text-foreground mb-4">
+            <Link
+              to="/"
+              className="flex items-center space-x-2 text-2xl font-bold text-foreground mb-4"
+            >
               <Code className="w-8 h-8 text-primary" />
               <span className="hero-text">Codifica</span>
             </Link>
             <p className="text-muted-foreground mb-6 max-w-md leading-relaxed">
-              Desenvolvemos soluções inteligentes em software para transformar ideias em resultados. 
-              Seu parceiro tecnológico para o futuro.
+              Desenvolvemos soluções inteligentes em software para transformar
+              ideias em resultados. Seu parceiro tecnológico para o futuro.
             </p>
-            
+
             {/* Contact Info */}
             <div className="space-y-3">
               <div className="flex items-center space-x-3 text-muted-foreground">
@@ -41,22 +52,34 @@ const Footer = () => {
             <h3 className="font-semibold text-foreground mb-4">Navegação</h3>
             <ul className="space-y-3">
               <li>
-                <Link to="/" className="text-muted-foreground hover:text-primary transition-colors duration-300 link-underline">
+                <Link
+                  to="/"
+                  className="text-muted-foreground hover:text-primary transition-colors duration-300 link-underline"
+                >
                   Home
                 </Link>
               </li>
               <li>
-                <Link to="/portfolio" className="text-muted-foreground hover:text-primary transition-colors duration-300 link-underline">
+                <Link
+                  to="/portfolio"
+                  className="text-muted-foreground hover:text-primary transition-colors duration-300 link-underline"
+                >
                   Portfólio
                 </Link>
               </li>
               <li>
-                <Link to="/sobre" className="text-muted-foreground hover:text-primary transition-colors duration-300 link-underline">
+                <Link
+                  to="/sobre"
+                  className="text-muted-foreground hover:text-primary transition-colors duration-300 link-underline"
+                >
                   Sobre
                 </Link>
               </li>
               <li>
-                <Link to="/contato" className="text-muted-foreground hover:text-primary transition-colors duration-300 link-underline">
+                <Link
+                  to="/contato"
+                  className="text-muted-foreground hover:text-primary transition-colors duration-300 link-underline"
+                >
                   Contato
                 </Link>
               </li>
@@ -81,24 +104,24 @@ const Footer = () => {
           <p className="text-muted-foreground text-sm mb-4 md:mb-0">
             © {currentYear} Codifica. Todos os direitos reservados.
           </p>
-          
+
           <div className="flex space-x-6">
-            <a 
-              href="#" 
+            <a
+              href="#"
               className="text-muted-foreground hover:text-primary transition-colors duration-300"
               aria-label="Github"
             >
               <Github className="w-5 h-5" />
             </a>
-            <a 
-              href="#" 
+            <a
+              href="#"
               className="text-muted-foreground hover:text-primary transition-colors duration-300"
               aria-label="LinkedIn"
             >
               <Linkedin className="w-5 h-5" />
             </a>
-            <a 
-              href="#" 
+            <a
+              href="#"
               className="text-muted-foreground hover:text-primary transition-colors duration-300"
               aria-label="Twitter"
             >
