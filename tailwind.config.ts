@@ -14,6 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
+        sans: ['Manrope', 'Inter', 'system-ui', 'sans-serif'],
+        manrope: ['Manrope', 'sans-serif'],
         inter: ['Inter', 'sans-serif'],
       },
       colors: {

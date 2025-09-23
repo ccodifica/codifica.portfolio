@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -87,7 +90,8 @@
   }
 
   body {
-    @apply bg-background text-foreground font-inter antialiased;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
     background-image: 
       radial-gradient(circle at 20% 20%, hsl(262 100% 58% / 0.1) 0%, transparent 50%),
       radial-gradient(circle at 80% 80%, hsl(195 100% 50% / 0.1) 0%, transparent 50%);
@@ -113,7 +117,13 @@
 @layer components {
   /* Hero Text Effect */
   .hero-text {
-    @apply bg-gradient-to-r from-foreground via-primary to-accent bg-clip-text text-transparent;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 20%, #cbd5e1 40%, #94a3b8 60%, #64748b 80%, #475569 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.02em;
   }
 
   /* Glow Effect */
@@ -212,5 +222,137 @@
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Full-bleed container utility (escape central page padding) */
+  .full-bleed {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    margin-left: -50vw;
+    right: 50%;
+    margin-right: -50vw;
+  }
+
+  /* Carousel mask fade on edges */
+  .carousel-mask {
+    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  }
+
+  .carousel-track {
+    will-change: transform;
+  }
+
+  /* Infinite Scroll Carousel */
+  .infinite-scroll-container {
+    width: 100vw;
+    overflow: hidden;
+    position: relative;
+    padding: 1.5rem 0;
+  }
+
+  .infinite-scroll-track {
+    display: flex;
+    gap: 1.5rem;
+    width: max-content;
+    animation: infinite-scroll 60s linear infinite;
+    will-change: transform;
+  }
+
+  .infinite-scroll-track:hover {
+    animation-play-state: paused;
+  }
+
+  .carousel-item {
+    flex: 0 0 16rem;
+    height: 10rem;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: hsl(var(--card) / 0.3);
+    border: 1px solid hsl(var(--border) / 0.3);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    transition: transform 0.3s ease;
+  }
+
+  .carousel-item:hover {
+    transform: scale(1.05);
+  }
+
+  @keyframes infinite-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(calc(-50% - 0.75rem));
+    }
+  }
+
+  /* Typewriter Text Animation */
+  .typewriter-container {
+    font-family: 'DM Serif Display', 'Benton Modern Display Extra', serif;
+    font-size: 1.6em;
+    font-style: italic;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+  }
+
+  .perfect-for-text {
+    font-family: 'DM Serif Display', 'Benton Modern Display Extra', serif;
+    font-size: 1.6em;
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .typewriter-word-container {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.5em;
+    min-width: 280px;
+    justify-content: flex-start;
+  }
+
+  .typewriter-text {
+    font-family: 'DM Serif Display', 'Benton Modern Display Extra', serif;
+    font-size: 1.6em;
+    font-style: italic;
+    color: #FFD700;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  .typewriter-cursor {
+    color: #FFD700;
+    font-weight: 400;
+    margin-left: 2px;
+    transition: opacity 0.1s ease-in-out;
+    animation: cursorBlink 1s infinite;
+  }
+
+  @keyframes cursorBlink {
+    0%, 50% {
+      opacity: 1;
+    }
+    51%, 100% {
+      opacity: 0;
+    }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    .typewriter-container {
+      flex-direction: column;
+      gap: 0.5rem;
+      text-align: center;
+    }
+    
+    .typewriter-word-container {
+      justify-content: center;
+      min-width: 150px;
+    }
   }
 }
