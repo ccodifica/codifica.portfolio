@@ -58,7 +58,7 @@ const Footer = () => {
                 <WhatsAppIcon className="w-5 h-5 text-primary" />
                 <button
                   onClick={() => {
-                    const phoneNumber = "5521999999999";
+                    const phoneNumber = "5521982998010"; // +55 21 98299-8010
                     const message = encodeURIComponent("Olá! Gostaria de saber mais sobre os serviços da Codifica.");
                     window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
                   }}
@@ -122,12 +122,12 @@ const Footer = () => {
         </div>
 
         {/* Social Links & Copyright */}
-        <div className="border-t border-border/50 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-muted-foreground text-sm mb-4 md:mb-0">
+        <div className="border-t border-border/50 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-muted-foreground text-sm text-center md:text-left">
             © {currentYear} Codifica. Todos os direitos reservados.
           </p>
 
-          <div className="flex space-x-6">
+          <div className="flex space-x-6 order-3 md:order-2">
             <a
               href="https://github.com/ccodifica"
               target="_blank"
@@ -146,6 +146,12 @@ const Footer = () => {
             >
               <Instagram className="w-5 h-5" />
             </a>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center gap-3 text-sm text-muted-foreground order-2 md:order-3">
+            <Link to="/termos" className="hover:text-primary transition-colors duration-300">Termos de Uso</Link>
+            <span className="hidden sm:inline">•</span>
+            <Link to="/privacidade" className="hover:text-primary transition-colors duration-300">Política de Privacidade</Link>
           </div>
         </div>
       </div>

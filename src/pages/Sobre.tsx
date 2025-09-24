@@ -50,17 +50,7 @@ const Sobre = () => {
   }, []);
 
   const handleContactClick = () => {
-    navigate('/');
-    // Wait for navigation to complete, then scroll to contact
-    setTimeout(() => {
-      const contactElement = document.getElementById('contact');
-      if (contactElement) {
-        contactElement.scrollIntoView({ 
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }
-    }, 100);
+    navigate('/', { state: { target: 'contact' } });
   };
 
   useEffect(() => {

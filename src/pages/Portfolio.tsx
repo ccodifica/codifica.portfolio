@@ -17,17 +17,7 @@ const Portfolio = () => {
   const navigate = useNavigate();
 
   const handleContactClick = () => {
-    navigate('/');
-    // Wait for navigation to complete, then scroll to contact
-    setTimeout(() => {
-      const contactElement = document.getElementById('contact');
-      if (contactElement) {
-        contactElement.scrollIntoView({ 
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }
-    }, 100);
+    navigate('/', { state: { target: 'contact' } });
   };
 
   useEffect(() => {
@@ -164,7 +154,8 @@ const Portfolio = () => {
               >
                 {/* Project Image */}
                 <div className="relative overflow-hidden">
-                  <div className={`absolute inset-0 bg-gradient-to-br ${project.color} opacity-80 group-hover:opacity-60 transition-opacity duration-300`} />
+                  {/* Removido overlay de cor para exibir imagem original */}
+                  <div className="hidden" />
                   <img 
                     src={project.image} 
                     alt={project.title}
