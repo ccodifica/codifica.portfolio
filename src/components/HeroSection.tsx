@@ -1,4 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
+import projectEcommerce from "@/assets/project-ecommerce.jpg";
+import projectDelivery from "@/assets/project-delivery.jpg";
+import projectErp from "@/assets/project-erp.jpg";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -210,27 +213,30 @@ const HeroSection = () => {
               <div className="infinite-scroll-container">
                 <div className="infinite-scroll-track">
                   {/* Criando múltiplas cópias para garantir loop seamless */}
-                  {Array.from({ length: 4 }).map((_, setIndex) =>
-                    [
-                      "/src/assets/project-ecommerce.jpg",
-                      "/src/assets/project-delivery.jpg",
-                      "/src/assets/project-erp.jpg",
-                      "/src/assets/project-ecommerce.jpg",
-                      "/src/assets/project-delivery.jpg",
-                      "/src/assets/project-erp.jpg",
-                    ].map((src, i) => (
-                      <div
-                        key={`set${setIndex}-${i}`}
-                        className="carousel-item"
-                      >
-                        <img
-                          src={src}
-                          alt={setIndex === 0 ? `Projeto ${i + 1}` : ""}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    ))
-                  )}
+                  {(() => {
+                    const baseImages = [
+                      { src: projectEcommerce, alt: "Projeto E-commerce" },
+                      { src: projectDelivery, alt: "Projeto Delivery" },
+                      { src: projectErp, alt: "Projeto ERP" },
+                    ];
+                    // Duplicar sequência para loop suave
+                    const sequence = [...baseImages, ...baseImages];
+                    return Array.from({ length: 4 }).flatMap((_, setIndex) =>
+                      sequence.map((img, i) => (
+                        <div key={`set${setIndex}-${i}`} className="carousel-item">
+                          <img
+                            src={img.src}
+                            alt={setIndex === 0 ? img.alt : ""}
+                            loading="lazy"
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).style.opacity = '0.3';
+                            }}
+                          />
+                        </div>
+                      ))
+                    );
+                  })()}
                 </div>
               </div>
             </div>
