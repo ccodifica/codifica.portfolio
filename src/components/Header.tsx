@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Code } from "lucide-react";
+import { Menu, X, Code, UserCircle2 } from "lucide-react";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -47,7 +47,7 @@ const Header = () => {
   }, []);
 
   const navItems = [
-    { name: "Home", path: "/" },
+    { name: "Início", path: "/" },
     { name: "Projetos", path: "/portfolio" },
     { name: "Sobre", path: "/sobre" },
   ];
@@ -94,7 +94,16 @@ const Header = () => {
                 {item.name}
               </Link>
             ))}
-            <Button 
+            <Link to="/espaco-do-cliente" onClick={() => setIsMenuOpen(false)}>
+              <Button
+                variant="outline"
+                className="font-semibold px-5 py-2 rounded-lg border-primary/40 text-foreground hover:bg-primary/10 hover:text-primary transition-all duration-300"
+              >
+                <UserCircle2 className="w-4 h-4 mr-2" />
+                Espaço do Cliente
+              </Button>
+            </Link>
+            <Button
               onClick={handleContactClick}
               className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 py-2 rounded-lg transition-all duration-300"
             >
@@ -139,9 +148,18 @@ const Header = () => {
                   {item.name}
                 </Link>
               ))}
-              <Button 
+              <Link to="/espaco-do-cliente" onClick={() => setIsMenuOpen(false)}>
+                <Button
+                  variant="outline"
+                  className="font-semibold px-5 py-2 rounded-lg border-primary/40 text-foreground hover:bg-primary/10 hover:text-primary transition-all duration-300 w-full mt-2"
+                >
+                  <UserCircle2 className="w-4 h-4 mr-2" />
+                  Espaço do Cliente
+                </Button>
+              </Link>
+              <Button
                 onClick={handleContactClick}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 py-2 rounded-lg transition-all duration-300 w-full mt-4"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 py-2 rounded-lg transition-all duration-300 w-full"
               >
                 Fale Conosco
               </Button>

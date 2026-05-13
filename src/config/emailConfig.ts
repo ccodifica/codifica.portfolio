@@ -1,62 +1,42 @@
-// EmailJS Configuration - Credenciais reais
-export const emailConfig = {
-  // Credenciais reais do EmailJS
-  serviceId: 'service_kh4vgfc',      // ✅ Service ID correto
-  templateId: 'template_736yr0u',    // ✅ Template ID correto  
-  publicKey: 'e2b33sslmOMMHr5iP',    // ✅ Public Key correto
-  
-  // E-mail de destino para todos os formulários
-  toEmail: 'ccodifica@gmail.com'
+// EmailJS — Credenciais por tipo de e-mail
+// Cada chave aponta para (serviceId + publicKey + templateId). Permite usar
+// contas EmailJS diferentes para tipos diferentes de e-mail (plano free só
+// aceita 2 templates por conta).
+
+export interface EmailJSEndpoint {
+  serviceId: string;
+  publicKey: string;
+  templateId: string;
+}
+
+// Conta 1 — "Codifica Company"
+const CONTA_1 = {
+  serviceId: "service_kh4vgfc",
+  publicKey: "e2b33sslmOMMHr5iP",
 };
 
-// Template de e-mail que será usado no EmailJS
-export const emailTemplate = `
-Assunto: [PRIORITÁRIO] Nova solicitação de orçamento - {{service}}
+// Conta 2 — "CodificaCompany" (criada por causa do limite de templates)
+const CONTA_2 = {
+  serviceId: "service_mgzgnoi",
+  publicKey: "xEKI9fCa3IGIDqc1r",
+};
 
-Nova mensagem recebida através do formulário do site:
+export const emailEndpoints = {
+  contactForm: {
+    ...CONTA_1,
+    templateId: "template_736yr0u",
+  } as EmailJSEndpoint,
 
-📧 INFORMAÇÕES DE CONTATO
-Nome: {{name || 'Não informado'}}
-E-mail: {{email}}
+  meetingScheduled: {
+    ...CONTA_1,
+    templateId: "template_bdeb24h",
+  } as EmailJSEndpoint,
 
-🎯 SERVIÇO DE INTERESSE
-{{service}}
+  meetingLinkReady: {
+    ...CONTA_2,
+    templateId: "template_5r7bl01",
+  } as EmailJSEndpoint,
+} as const;
 
-📝 DESCRIÇÃO DO PROJETO
-{{description || 'Não informada'}}
-
----
-Data/Hora: {{date}}
-IP: {{userIP || 'Não disponível'}}
-
-Esta mensagem foi enviada automaticamente através do formulário de contato do site.
-Para responder, utilize o e-mail: {{email}}
-`;
-
-// Instruções de configuração do EmailJS
-export const setupInstructions = `
-CONFIGURAÇÃO DO EMAILJS:
-
-1. Acesse https://www.emailjs.com/ e crie uma conta
-2. Configure um serviço de e-mail (recomendado: Gmail)
-3. Crie um template de e-mail com os seguintes campos:
-   - {{name}} - Nome do usuário
-   - {{email}} - E-mail do usuário  
-   - {{service}} - Serviço selecionado
-   - {{description}} - Descrição do projeto
-   - {{date}} - Data/hora do envio
-4. Configure o template para marcar como prioritário (adicione "Priority: high" nos headers)
-5. Substitua as constantes no arquivo emailConfig.ts pelos seus valores reais
-6. Teste o envio através do dashboard do EmailJS
-
-TEMPLATE SUGERIDO NO EMAILJS:
-Assunto: [PRIORITÁRIO] Nova solicitação - {{service}}
-Para: ccodifica@gmail.com
-
-Nova mensagem do formulário:
-Nome: {{name}}
-E-mail: {{email}} 
-Serviço: {{service}}
-Descrição: {{description}}
-Data: {{date}}
-`;
+// E-mail interno do admin (destinatário fixo de notificações)
+export const ADMIN_EMAIL = "ccodifica@gmail.com";

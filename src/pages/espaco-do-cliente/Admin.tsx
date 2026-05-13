@@ -1,0 +1,1085 @@
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
+  ArrowLeft,
+  LogOut,
+  MessageSquare,
+  Shield,
+  Users,
+  Briefcase,
+  ClipboardList,
+  Save,
+  Activity,
+  FileText,
+  CalendarDays,
+  Trash2,
+  Plus,
+  Video,
+  Clock,
+  ExternalLink,
+} from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  MEETING_STATUS_LABEL,
+  Meeting,
+  MeetingStatus,
+  PROJECT_STATUS_LABEL,
+  PROJECT_STATUS_ORDER,
+  PROJECT_TYPE_LABEL,
+  Project,
+  ProjectEvent,
+  ProjectStatus,
+  User,
+} from "@/types/client-area";
+import {
+  MEETING_STATUS_BADGES,
+  STATUS_PROGRESS_MAP,
+  createEvent,
+  deleteEvent,
+  listEventsByProject,
+  listMeetings,
+  listMeetingsByProject,
+  listProjects,
+  listUsers,
+  updateMeeting,
+  updateProject,
+} from "@/lib/client-area-store";
+import { toast } from "@/components/ui/sonner";
+import {
+  BriefingDisplay,
+  ChatPanel,
+  StatusBadge,
+  TimelineEtapas,
+  buildWhatsappLink,
+  formatDataBR,
+} from "./_shared";
+import { emailService } from "@/services/emailService";
+
+type ListaTab = "andamento" | "concluido";
+type StatusFiltro = "todos" | ProjectStatus;
+
+const MEETING_STATUS_VALUES: MeetingStatus[] = [
+  "agendada",
+  "confirmada",
+  "realizada",
+  "cancelada",
+  "remarcada",
+];
+
+const Admin = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [usuarios, setUsuarios] = useState<User[]>([]);
+  const [meetings, setMeetings] = useState<Meeting[]>([]);
+  const [listaTab, setListaTab] = useState<ListaTab>("andamento");
+  const [filtroStatus, setFiltroStatus] = useState<StatusFiltro>("todos");
+  const [busca, setBusca] = useState("");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  const reload = async () => {
+    try {
+      const [pr, us, mt] = await Promise.all([
+        listProjects(),
+        listUsers(),
+        listMeetings(),
+      ]);
+      setProjects(pr);
+      setUsuarios(us);
+      setMeetings(mt);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Erro ao carregar.";
+      toast.error(msg);
+    }
+  };
+
+  useEffect(() => {
+    reload();
+  }, []);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/espaco-do-cliente", { replace: true });
+  };
+
+  const projetosEmAndamento = useMemo(
+    () => projects.filter((p) => p.status !== "concluido"),
+    [projects]
+  );
+  const projetosConcluidos = useMemo(
+    () => projects.filter((p) => p.status === "concluido"),
+    [projects]
+  );
+
+  const filtrados = useMemo(() => {
+    const base =
+      listaTab === "andamento" ? projetosEmAndamento : projetosConcluidos;
+    const termo = busca.trim().toLowerCase();
+    return base.filter((p) => {
+      if (
+        listaTab === "andamento" &&
+        filtroStatus !== "todos" &&
+        p.status !== filtroStatus
+      )
+        return false;
+      if (!termo) return true;
+      const dono = usuarios.find((u) => u.id === p.clienteId);
+      const blob = `${p.nome} ${dono?.nome ?? ""} ${dono?.email ?? ""} ${
+        p.briefing.empresa ?? ""
+      }`.toLowerCase();
+      return blob.includes(termo);
+    });
+  }, [
+    projetosEmAndamento,
+    projetosConcluidos,
+    listaTab,
+    filtroStatus,
+    busca,
+    usuarios,
+  ]);
+
+  const stats = useMemo(() => {
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    const proximas = meetings.filter((m) => {
+      if (m.status === "cancelada" || m.status === "realizada") return false;
+      const [y, mo, d] = m.data.split("-").map(Number);
+      const dt = new Date(y, mo - 1, d);
+      return dt >= hoje;
+    }).length;
+    return {
+      leads: projects.filter((p) => p.status === "aguardando_analise").length,
+      ativos: projetosEmAndamento.length,
+      reunioes: proximas,
+      clientes: usuarios.filter((u) => u.role === "cliente").length,
+    };
+  }, [projects, projetosEmAndamento, meetings, usuarios]);
+
+  const selecionado = projects.find((p) => p.id === selectedId);
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main className="pt-28 pb-20">
+        <section className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-medium mb-2">
+                  <Shield className="w-3 h-3" />
+                  Modo Admin
+                </div>
+                <h1 className="text-3xl md:text-4xl font-bold font-manrope">
+                  Painel Codifica
+                </h1>
+                <p className="text-muted-foreground mt-1">
+                  Gerencie leads, projetos, reuniões e mensagens dos clientes.
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                onClick={handleLogout}
+                className="text-muted-foreground self-start"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Sair
+              </Button>
+            </div>
+
+            {selecionado ? (
+              <AdminProjectDetail
+                project={selecionado}
+                cliente={usuarios.find((u) => u.id === selecionado.clienteId)}
+                adminId={user!.id}
+                adminName={user!.nome}
+                onBack={() => {
+                  setSelectedId(null);
+                  reload();
+                }}
+                onAfterChange={reload}
+              />
+            ) : (
+              <>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
+                  <StatCard
+                    icon={ClipboardList}
+                    label="Leads aguardando"
+                    value={stats.leads}
+                    tone="primary"
+                  />
+                  <StatCard
+                    icon={Briefcase}
+                    label="Projetos ativos"
+                    value={stats.ativos}
+                    tone="accent"
+                  />
+                  <StatCard
+                    icon={CalendarDays}
+                    label="Reuniões próximas"
+                    value={stats.reunioes}
+                    tone="success"
+                  />
+                  <StatCard
+                    icon={Users}
+                    label="Clientes cadastrados"
+                    value={stats.clientes}
+                    tone="primary"
+                  />
+                </div>
+
+                <Tabs
+                  value={listaTab}
+                  onValueChange={(v) => setListaTab(v as ListaTab)}
+                  className="mb-5"
+                >
+                  <TabsList className="grid grid-cols-2 w-full sm:w-auto sm:inline-flex">
+                    <TabsTrigger value="andamento" className="gap-2">
+                      <Activity className="w-4 h-4" />
+                      Em andamento
+                      <span className="ml-1 text-[10px] bg-muted/60 px-1.5 py-0.5 rounded-full">
+                        {projetosEmAndamento.length}
+                      </span>
+                    </TabsTrigger>
+                    <TabsTrigger value="concluido" className="gap-2">
+                      <Briefcase className="w-4 h-4" />
+                      Concluídos
+                      <span className="ml-1 text-[10px] bg-muted/60 px-1.5 py-0.5 rounded-full">
+                        {projetosConcluidos.length}
+                      </span>
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
+
+                <div className="flex flex-col sm:flex-row gap-3 mb-5">
+                  <Input
+                    value={busca}
+                    onChange={(e) => setBusca(e.target.value)}
+                    placeholder="Buscar por cliente, empresa ou projeto..."
+                    className="flex-1"
+                  />
+                  {listaTab === "andamento" && (
+                    <Select
+                      value={filtroStatus}
+                      onValueChange={(v) =>
+                        setFiltroStatus(v as StatusFiltro)
+                      }
+                    >
+                      <SelectTrigger className="sm:w-56">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="todos">Todos os status</SelectItem>
+                        {PROJECT_STATUS_ORDER.filter((s) => s !== "concluido").map(
+                          (s) => (
+                            <SelectItem key={s} value={s}>
+                              {PROJECT_STATUS_LABEL[s]}
+                            </SelectItem>
+                          )
+                        )}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+
+                {filtrados.length === 0 ? (
+                  <div className="text-center py-16 bg-card/40 border border-border/60 rounded-2xl text-muted-foreground">
+                    {listaTab === "andamento"
+                      ? "Nenhum projeto em andamento com esses filtros."
+                      : "Nenhum projeto concluído ainda."}
+                  </div>
+                ) : (
+                  <div className="grid gap-3">
+                    {filtrados.map((p) => {
+                      const cli = usuarios.find((u) => u.id === p.clienteId);
+                      const meetingsDoProjeto = meetings.filter(
+                        (m) => m.projectId === p.id
+                      );
+                      return (
+                        <AdminProjectRow
+                          key={p.id}
+                          project={p}
+                          cliente={cli}
+                          meetingsCount={meetingsDoProjeto.length}
+                          onClick={() => setSelectedId(p.id)}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </div>
+  );
+};
+
+const StatCard = ({
+  icon: Icon,
+  label,
+  value,
+  tone,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: number;
+  tone: "primary" | "accent" | "success";
+}) => {
+  const colorMap = {
+    primary: "bg-primary/15 text-primary",
+    accent: "bg-accent/15 text-accent",
+    success: "bg-success/15 text-success",
+  };
+  return (
+    <div className="p-4 sm:p-5 rounded-2xl border border-border/60 bg-card/50">
+      <div
+        className={`w-9 h-9 rounded-lg flex items-center justify-center mb-3 ${colorMap[tone]}`}
+      >
+        <Icon className="w-4 h-4" />
+      </div>
+      <div className="text-2xl sm:text-3xl font-bold">{value}</div>
+      <div className="text-xs sm:text-sm text-muted-foreground mt-1">
+        {label}
+      </div>
+    </div>
+  );
+};
+
+const AdminProjectRow = ({
+  project,
+  cliente,
+  meetingsCount,
+  onClick,
+}: {
+  project: Project;
+  cliente?: User;
+  meetingsCount: number;
+  onClick: () => void;
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className="text-left p-5 rounded-2xl border border-border/60 bg-card/50 hover:border-primary/40 hover:bg-card/80 transition-all duration-200"
+  >
+    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+      <div className="flex-1 min-w-0">
+        <div className="text-xs font-medium text-muted-foreground mb-0.5 flex items-center gap-2">
+          <span>{PROJECT_TYPE_LABEL[project.tipo]}</span>
+          <span>·</span>
+          <span>
+            {new Date(project.createdAt).toLocaleDateString("pt-BR")}
+          </span>
+          {meetingsCount > 0 && (
+            <>
+              <span>·</span>
+              <span className="inline-flex items-center gap-1">
+                <CalendarDays className="w-3 h-3" />
+                {meetingsCount} reunião(ões)
+              </span>
+            </>
+          )}
+        </div>
+        <h3 className="font-bold truncate">{project.nome}</h3>
+        <div className="text-sm text-muted-foreground truncate">
+          {cliente ? `${cliente.nome} · ${cliente.email}` : "Cliente removido"}
+        </div>
+      </div>
+      <div className="flex items-center gap-3 sm:gap-4">
+        <div className="w-28">
+          <Progress value={project.progresso} className="h-2" />
+          <div className="text-[10px] text-muted-foreground text-right mt-1">
+            {project.progresso}%
+          </div>
+        </div>
+        <StatusBadge status={project.status} />
+      </div>
+    </div>
+  </button>
+);
+
+const AdminProjectDetail = ({
+  project,
+  cliente,
+  adminId,
+  adminName,
+  onBack,
+  onAfterChange,
+}: {
+  project: Project;
+  cliente?: User;
+  adminId: string;
+  adminName: string;
+  onBack: () => void;
+  onAfterChange: () => void;
+}) => {
+  return (
+    <div className="space-y-6">
+      <Button
+        variant="ghost"
+        onClick={onBack}
+        className="text-muted-foreground hover:text-foreground -ml-2"
+      >
+        <ArrowLeft className="w-4 h-4 mr-2" />
+        Voltar para a lista
+      </Button>
+
+      <div className="p-6 md:p-8 rounded-2xl border border-border/60 bg-card/50">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <div className="text-xs font-medium text-muted-foreground mb-1">
+              {PROJECT_TYPE_LABEL[project.tipo]} ·{" "}
+              {new Date(project.createdAt).toLocaleDateString("pt-BR")}
+            </div>
+            <h2 className="text-2xl font-bold">{project.nome}</h2>
+            <div className="text-sm text-muted-foreground mt-1">
+              {cliente
+                ? `${cliente.nome} · ${cliente.email}${
+                    cliente.celular ? ` · ${cliente.celular}` : ""
+                  }`
+                : "Cliente removido"}
+            </div>
+          </div>
+          <StatusBadge status={project.status} />
+        </div>
+        <div className="mt-5">
+          <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
+            <span>Progresso</span>
+            <span>{project.progresso}%</span>
+          </div>
+          <Progress value={project.progresso} className="h-2" />
+        </div>
+      </div>
+
+      <Tabs defaultValue="andamento" className="w-full">
+        <TabsList className="grid grid-cols-2 md:grid-cols-4 w-full h-auto">
+          <TabsTrigger value="andamento" className="gap-2 py-2">
+            <Activity className="w-4 h-4" /> Andamento
+          </TabsTrigger>
+          <TabsTrigger value="briefing" className="gap-2 py-2">
+            <FileText className="w-4 h-4" /> Briefing
+          </TabsTrigger>
+          <TabsTrigger value="reuniao" className="gap-2 py-2">
+            <CalendarDays className="w-4 h-4" /> Reunião
+          </TabsTrigger>
+          <TabsTrigger value="mensagens" className="gap-2 py-2">
+            <MessageSquare className="w-4 h-4" /> Mensagens
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="andamento" className="mt-6">
+          <AndamentoTab
+            project={project}
+            adminId={adminId}
+            adminName={adminName}
+            onAfterChange={onAfterChange}
+          />
+        </TabsContent>
+
+        <TabsContent value="briefing" className="mt-6">
+          <div className="p-6 md:p-8 rounded-2xl border border-border/60 bg-card/50">
+            <BriefingDisplay briefing={project.briefing} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="reuniao" className="mt-6">
+          <ReuniaoTab
+            project={project}
+            cliente={cliente}
+            onAfterChange={onAfterChange}
+          />
+        </TabsContent>
+
+        <TabsContent value="mensagens" className="mt-6">
+          <div className="p-6 md:p-8 rounded-2xl border border-border/60 bg-card/50">
+            <div className="mb-5">
+              <h3 className="text-lg font-bold flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-primary" />
+                Conversa com {cliente?.nome ?? "cliente"}
+              </h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                Anexos suportados: imagens, PDF, Word, Excel, PowerPoint e ZIP
+                (máx. 1 MB por arquivo nesta versão).
+              </p>
+            </div>
+            <ChatPanel
+              projectId={project.id}
+              userId={adminId}
+              userName={adminName}
+              userRole="admin"
+            />
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
+
+const AndamentoTab = ({
+  project,
+  adminId,
+  adminName,
+  onAfterChange,
+}: {
+  project: Project;
+  adminId: string;
+  adminName: string;
+  onAfterChange: () => void;
+}) => {
+  const [nome, setNome] = useState(project.nome);
+  const [status, setStatus] = useState<ProjectStatus>(project.status);
+  const [progresso, setProgresso] = useState<number>(project.progresso);
+  const [notas, setNotas] = useState(project.notasAdmin ?? "");
+  const [eventos, setEventos] = useState<ProjectEvent[]>([]);
+  const [novoEventoTitulo, setNovoEventoTitulo] = useState("");
+  const [novoEventoDescricao, setNovoEventoDescricao] = useState("");
+  const [novoEventoFase, setNovoEventoFase] = useState<ProjectStatus>(
+    project.status
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const evs = await listEventsByProject(project.id);
+        if (!cancelled) setEventos(evs);
+      } catch (err) {
+        if (!cancelled) {
+          const msg =
+            err instanceof Error ? err.message : "Erro ao carregar registros.";
+          toast.error(msg);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [project.id]);
+
+  const handleStatusChange = (s: ProjectStatus) => {
+    setStatus(s);
+    setProgresso(STATUS_PROGRESS_MAP[s]);
+    setNovoEventoFase(s);
+  };
+
+  const salvar = async () => {
+    try {
+      await updateProject(project.id, {
+        nome,
+        status,
+        progresso,
+        notasAdmin: notas,
+      });
+      toast.success("Projeto atualizado.");
+      onAfterChange();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Erro ao salvar.";
+      toast.error(msg);
+    }
+  };
+
+  const adicionarEvento = async () => {
+    if (!novoEventoTitulo.trim()) {
+      toast.error("Dê um título para o registro.");
+      return;
+    }
+    try {
+      const novo = await createEvent({
+        projectId: project.id,
+        fase: novoEventoFase,
+        titulo: novoEventoTitulo.trim(),
+        descricao: novoEventoDescricao.trim(),
+        autorId: adminId,
+        autorRole: "admin",
+        autorNome: adminName,
+      });
+      setEventos((evs) => [novo, ...evs]);
+      setNovoEventoTitulo("");
+      setNovoEventoDescricao("");
+      toast.success("Registro adicionado.");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Erro ao adicionar.";
+      toast.error(msg);
+    }
+  };
+
+  const removerEvento = async (id: string) => {
+    try {
+      await deleteEvent(id);
+      setEventos((evs) => evs.filter((e) => e.id !== id));
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Erro ao remover.";
+      toast.error(msg);
+    }
+  };
+
+  return (
+    <div className="grid lg:grid-cols-3 gap-6">
+      <div className="lg:col-span-2 space-y-6">
+        <div className="p-6 md:p-8 rounded-2xl border border-border/60 bg-card/50">
+          <h3 className="text-sm font-semibold text-muted-foreground mb-5 uppercase tracking-wide">
+            Status e progresso
+          </h3>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="nomeProj">Nome do projeto</Label>
+              <Input
+                id="nomeProj"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                className="mt-2"
+              />
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <Label>Status</Label>
+                <Select
+                  value={status}
+                  onValueChange={(v) =>
+                    handleStatusChange(v as ProjectStatus)
+                  }
+                >
+                  <SelectTrigger className="mt-2">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PROJECT_STATUS_ORDER.map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {PROJECT_STATUS_LABEL[s]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="progresso">Progresso (%)</Label>
+                <Input
+                  id="progresso"
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={progresso}
+                  onChange={(e) =>
+                    setProgresso(
+                      Math.max(0, Math.min(100, Number(e.target.value) || 0))
+                    )
+                  }
+                  className="mt-2"
+                />
+              </div>
+            </div>
+
+            <Progress value={progresso} className="h-2" />
+
+            <div>
+              <Label htmlFor="notas">
+                Notas internas (não visíveis ao cliente)
+              </Label>
+              <Textarea
+                id="notas"
+                value={notas}
+                onChange={(e) => setNotas(e.target.value)}
+                placeholder="Anotações sobre o projeto, próximos passos, observações..."
+                rows={4}
+                className="mt-2 resize-none"
+              />
+            </div>
+
+            <Button
+              onClick={salvar}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              Salvar alterações
+            </Button>
+          </div>
+        </div>
+
+        <div className="p-6 md:p-8 rounded-2xl border border-border/60 bg-card/50">
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+              Registros de andamento (visíveis ao cliente)
+            </h3>
+          </div>
+
+          <div className="p-4 rounded-lg bg-muted/30 border border-border/40 mb-5 space-y-3">
+            <div className="grid sm:grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs">Fase</Label>
+                <Select
+                  value={novoEventoFase}
+                  onValueChange={(v) => setNovoEventoFase(v as ProjectStatus)}
+                >
+                  <SelectTrigger className="mt-1 h-9 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PROJECT_STATUS_ORDER.map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {PROJECT_STATUS_LABEL[s]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-xs">Título do registro</Label>
+                <Input
+                  value={novoEventoTitulo}
+                  onChange={(e) => setNovoEventoTitulo(e.target.value)}
+                  placeholder="Ex.: Briefing aprovado"
+                  className="mt-1 h-9 text-sm"
+                />
+              </div>
+            </div>
+            <div>
+              <Label className="text-xs">Descrição (opcional)</Label>
+              <Textarea
+                value={novoEventoDescricao}
+                onChange={(e) => setNovoEventoDescricao(e.target.value)}
+                placeholder="Detalhes que o cliente vai ver no painel..."
+                rows={2}
+                className="mt-1 resize-none text-sm"
+              />
+            </div>
+            <Button
+              onClick={adicionarEvento}
+              size="sm"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Adicionar registro
+            </Button>
+          </div>
+
+          {eventos.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-6">
+              Nenhum registro ainda. O primeiro vai aparecer no painel do
+              cliente como histórico.
+            </p>
+          ) : (
+            <ul className="space-y-4">
+              {eventos.map((e) => (
+                <li
+                  key={e.id}
+                  className="border-l-2 border-primary/40 pl-4 pb-1 group"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs text-muted-foreground mb-0.5">
+                        {PROJECT_STATUS_LABEL[e.fase]} ·{" "}
+                        {new Date(e.createdAt).toLocaleDateString("pt-BR")}
+                      </div>
+                      <div className="font-semibold text-sm">{e.titulo}</div>
+                      {e.descricao && (
+                        <div className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">
+                          {e.descricao}
+                        </div>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removerEvento(e.id)}
+                      className="text-muted-foreground/50 hover:text-destructive p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      title="Remover registro"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+
+      <aside className="space-y-4">
+        <div className="p-5 rounded-2xl border border-border/60 bg-card/50">
+          <h4 className="text-xs font-semibold text-muted-foreground mb-4 uppercase tracking-wide">
+            Etapas do projeto
+          </h4>
+          <TimelineEtapas statusAtual={status} />
+        </div>
+      </aside>
+    </div>
+  );
+};
+
+const ReuniaoTab = ({
+  project,
+  cliente,
+  onAfterChange,
+}: {
+  project: Project;
+  cliente?: User;
+  onAfterChange: () => void;
+}) => {
+  const [meetings, setMeetings] = useState<Meeting[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const ms = await listMeetingsByProject(project.id);
+        if (!cancelled) setMeetings(ms);
+      } catch (err) {
+        if (!cancelled) {
+          const msg =
+            err instanceof Error ? err.message : "Erro ao carregar reuniões.";
+          toast.error(msg);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [project.id]);
+
+  if (meetings.length === 0) {
+    return (
+      <div className="p-8 rounded-2xl border border-border/60 bg-card/50 text-center">
+        <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+          <CalendarDays className="w-7 h-7 text-primary" />
+        </div>
+        <h3 className="text-lg font-bold mb-2">
+          Nenhuma reunião agendada para este projeto
+        </h3>
+        <p className="text-sm text-muted-foreground max-w-md mx-auto">
+          O cliente optou por conversar mais tarde, ou ainda não respondeu a
+          essa etapa do briefing.
+        </p>
+      </div>
+    );
+  }
+
+  const recarregar = async () => {
+    try {
+      const ms = await listMeetingsByProject(project.id);
+      setMeetings(ms);
+      onAfterChange();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Erro ao recarregar.";
+      toast.error(msg);
+    }
+  };
+
+  return (
+    <div className="grid gap-4">
+      {meetings.map((m) => (
+        <MeetingAdminCard
+          key={m.id}
+          meeting={m}
+          cliente={cliente}
+          projectName={project.nome}
+          onSaved={recarregar}
+        />
+      ))}
+    </div>
+  );
+};
+
+const MeetingAdminCard = ({
+  meeting,
+  cliente,
+  projectName,
+  onSaved,
+}: {
+  meeting: Meeting;
+  cliente?: User;
+  projectName: string;
+  onSaved: () => void;
+}) => {
+  const [status, setStatus] = useState<MeetingStatus>(meeting.status);
+  const [meetLink, setMeetLink] = useState(meeting.meetLink ?? "");
+  const [observacoes, setObservacoes] = useState(meeting.observacoes ?? "");
+  const [data, setData] = useState(meeting.data);
+  const [horario, setHorario] = useState(meeting.horario);
+
+  const salvar = async () => {
+    try {
+      const novoMeetLink = meetLink.trim();
+      const antigoMeetLink = (meeting.meetLink ?? "").trim();
+      const meetLinkMudou =
+        novoMeetLink !== "" && novoMeetLink !== antigoMeetLink;
+
+      await updateMeeting(meeting.id, {
+        status,
+        meetLink: novoMeetLink || undefined,
+        observacoes: observacoes.trim() || undefined,
+        data,
+        horario,
+      });
+      toast.success("Reunião atualizada.");
+      onSaved();
+
+      if (meetLinkMudou && cliente && meeting.notificarEmail) {
+        emailService
+          .sendMeetingLinkReady({
+            toEmail: cliente.email,
+            toName: cliente.nome,
+            meetingDate: formatDataBR(data),
+            meetingTime: horario,
+            meetLink: novoMeetLink,
+            projectName,
+          })
+          .then(() => toast.success("Link enviado ao cliente por e-mail."))
+          .catch((err) => {
+            console.warn("Falha ao enviar e-mail do link:", err);
+            toast.error("Reunião salva, mas falhou ao enviar o e-mail do link.");
+          });
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Erro ao salvar.";
+      toast.error(msg);
+    }
+  };
+
+  const whatsappMsg = cliente
+    ? `Olá, ${cliente.nome.split(" ")[0]}! Confirmando nossa reunião dia ${formatDataBR(
+        data
+      )} às ${horario}.${meetLink ? ` Link do Meet: ${meetLink}` : ""}`
+    : "";
+
+  return (
+    <div className="p-6 md:p-8 rounded-2xl border border-border/60 bg-card/50">
+      <div className="flex items-start justify-between gap-4 mb-5">
+        <div>
+          <div className="text-xs font-medium text-muted-foreground mb-1">
+            Reunião com {cliente?.nome ?? "cliente"}
+          </div>
+          <h3 className="text-xl font-bold">{formatDataBR(data)}</h3>
+          <div className="text-muted-foreground flex items-center gap-1 mt-1">
+            <Clock className="w-4 h-4" />
+            <span>{horario}</span>
+          </div>
+        </div>
+        <span
+          className={`text-xs font-medium px-3 py-1 rounded-full border whitespace-nowrap ${MEETING_STATUS_BADGES[status]}`}
+        >
+          {MEETING_STATUS_LABEL[status]}
+        </span>
+      </div>
+
+      {meeting.topico && (
+        <div className="mb-5 p-3 rounded-lg bg-muted/40 border border-border/40">
+          <div className="text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wide">
+            Pauta do cliente
+          </div>
+          <div className="text-sm whitespace-pre-wrap">{meeting.topico}</div>
+        </div>
+      )}
+
+      <div className="grid sm:grid-cols-3 gap-4 mb-4">
+        <div>
+          <Label className="text-xs">Status</Label>
+          <Select
+            value={status}
+            onValueChange={(v) => setStatus(v as MeetingStatus)}
+          >
+            <SelectTrigger className="mt-1 h-9 text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {MEETING_STATUS_VALUES.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {MEETING_STATUS_LABEL[s]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label className="text-xs">Data</Label>
+          <Input
+            type="date"
+            value={data}
+            onChange={(e) => setData(e.target.value)}
+            className="mt-1 h-9 text-sm"
+          />
+        </div>
+        <div>
+          <Label className="text-xs">Horário</Label>
+          <Input
+            type="time"
+            value={horario}
+            onChange={(e) => setHorario(e.target.value)}
+            className="mt-1 h-9 text-sm"
+          />
+        </div>
+      </div>
+
+      <div className="mb-4">
+        <Label className="text-xs flex items-center gap-1">
+          <Video className="w-3.5 h-3.5" /> Link do Google Meet
+        </Label>
+        <Input
+          value={meetLink}
+          onChange={(e) => setMeetLink(e.target.value)}
+          placeholder="https://meet.google.com/..."
+          className="mt-1 h-9 text-sm"
+        />
+        <p className="text-[11px] text-muted-foreground mt-1">
+          Cole aqui o link do Meet. O cliente vai ver no painel dele.
+        </p>
+      </div>
+
+      <div className="mb-4">
+        <Label className="text-xs">Observações internas</Label>
+        <Textarea
+          value={observacoes}
+          onChange={(e) => setObservacoes(e.target.value)}
+          rows={2}
+          className="mt-1 resize-none text-sm"
+          placeholder="Anotações da reunião (não aparecem para o cliente)"
+        />
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <Button
+          onClick={salvar}
+          size="sm"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground"
+        >
+          <Save className="w-4 h-4 mr-2" />
+          Salvar
+        </Button>
+        {meeting.notificarWhatsapp && cliente?.celular && (
+          <a
+            href={buildWhatsappLink(cliente.celular, whatsappMsg)}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border/60 text-sm hover:bg-muted/30"
+          >
+            <MessageSquare className="w-4 h-4" />
+            Confirmar via WhatsApp
+            <ExternalLink className="w-3 h-3" />
+          </a>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Admin;

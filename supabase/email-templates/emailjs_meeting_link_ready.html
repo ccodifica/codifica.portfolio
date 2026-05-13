@@ -1,0 +1,85 @@
+<!--
+  EmailJS Template NOVO: "Link da reunião pronto"
+  Sent TO: {{to_email}} (cliente)
+  Variáveis: {{to_name}}, {{to_email}}, {{meeting_date}}, {{meeting_time}}, {{meet_link}}, {{project_name}}
+  Subject sugerido: "Seu link do Google Meet está pronto — reunião {{meeting_date}}"
+-->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="x-apple-disable-message-reformatting">
+  <title>Seu link de reunião</title>
+</head>
+<body style="margin:0; padding:0; background-color:#F4F5F8; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Helvetica, Arial, sans-serif;">
+  <span style="display:none; visibility:hidden; opacity:0; overflow:hidden; mso-hide:all; max-height:0; max-width:0; font-size:1px; line-height:1px;">Já está disponível o link da sua reunião com a Codifica.</span>
+  <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color:#F4F5F8; padding:40px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" style="max-width:560px; background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 8px 32px rgba(15,23,42,0.06);" border="0" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="background:linear-gradient(135deg, #8B3DF5 0%, #00BFFF 100%); padding:48px 32px; text-align:center;">
+              <div style="font-size:30px; font-weight:800; color:#ffffff; letter-spacing:-0.5px; line-height:1;">Codifica</div>
+              <div style="margin-top:10px; font-size:13px; color:rgba(255,255,255,0.85); font-weight:500;">Link do Google Meet</div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:40px 36px 8px;">
+              <h1 style="margin:0 0 16px; font-size:24px; font-weight:700; color:#0F172A; line-height:1.3;">Seu link está pronto, {{to_name}}!</h1>
+              <p style="margin:0 0 28px; font-size:15px; line-height:1.65; color:#475569;">
+                Estamos prontos para nossa conversa sobre <strong>{{project_name}}</strong>. Use o botão abaixo para entrar na reunião no horário marcado.
+              </p>
+
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px; background:linear-gradient(135deg, rgba(139,61,245,0.06) 0%, rgba(0,191,255,0.06) 100%); border-radius:14px; border:1px solid #E2E8F0;">
+                <tr>
+                  <td style="padding:20px 24px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="width:50%; vertical-align:top;">
+                          <p style="margin:0 0 4px; font-size:10px; color:#8B3DF5; text-transform:uppercase; letter-spacing:1px; font-weight:700;">📅 Data</p>
+                          <p style="margin:0; font-size:16px; font-weight:700; color:#0F172A;">{{meeting_date}}</p>
+                        </td>
+                        <td style="width:50%; vertical-align:top;">
+                          <p style="margin:0 0 4px; font-size:10px; color:#8B3DF5; text-transform:uppercase; letter-spacing:1px; font-weight:700;">⏰ Horário</p>
+                          <p style="margin:0; font-size:16px; font-weight:700; color:#0F172A;">{{meeting_time}}</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:24px auto 8px;">
+                <tr>
+                  <td align="center" style="border-radius:12px; background:linear-gradient(135deg, #8B3DF5 0%, #00BFFF 100%);">
+                    <a href="{{meet_link}}" style="display:inline-block; padding:16px 40px; font-size:16px; font-weight:700; color:#ffffff; text-decoration:none; border-radius:12px;">📹 Entrar no Google Meet</a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin:24px 0 8px; font-size:12px; line-height:1.6; color:#64748B; text-align:center;">Ou copie e cole o endereço no navegador:</p>
+              <p style="margin:0; padding:12px 14px; background:#F1F5F9; border-radius:8px; font-size:12px; color:#475569; word-break:break-all; font-family:'SF Mono', Menlo, Consolas, monospace; text-align:center;">{{meet_link}}</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:24px 36px 36px;">
+              <div style="padding:14px 16px; background:#EFF6FF; border-left:3px solid #00BFFF; border-radius:0 8px 8px 0; font-size:13px; line-height:1.6; color:#0C4A6E;">
+                <strong>Dica:</strong> teste seu microfone e câmera uns 5 minutos antes do horário. Se algo der errado, é só nos avisar pelo Espaço do Cliente.
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="background:#F8FAFC; padding:24px 36px; text-align:center; border-top:1px solid #E2E8F0;">
+              <p style="margin:0 0 6px; font-size:14px; font-weight:700; color:#0F172A;">Codifica</p>
+              <p style="margin:0 0 8px; font-size:12px; color:#94A3B8;">Desenvolvimento web, mobile e sistemas sob medida</p>
+              <p style="margin:0; font-size:11px; color:#CBD5E1;">Rio de Janeiro · Brasil</p>
+            </td>
+          </tr>
+        </table>
+        <p style="margin:20px 0 0; font-size:11px; color:#94A3B8;">Nos vemos em breve! 🚀</p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
