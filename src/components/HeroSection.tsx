@@ -1,7 +1,11 @@
 import { useEffect, useState, useMemo } from "react";
-import projectEcommerce from "@/assets/project-ecommerce.jpg";
-import projectDelivery from "@/assets/project-delivery.jpg";
-import projectErp from "@/assets/project-erp.jpg";
+import projectArcanjo from "@/assets/project-arcanjo.png";
+import projectBaile55 from "@/assets/project-baile55.png";
+import projectConsultec from "@/assets/project-consultec.png";
+import projectJardins from "@/assets/project-jardins.png";
+import projectKidstogether from "@/assets/project-kidstogether.png";
+import projectMeiodomato from "@/assets/project-meiodomato.png";
+import projectServitec from "@/assets/project-servitec.png";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -215,24 +219,36 @@ const HeroSection = () => {
                   {/* Criando múltiplas cópias para garantir loop seamless */}
                   {(() => {
                     const baseImages = [
-                      { src: projectEcommerce, alt: "Projeto E-commerce" },
-                      { src: projectDelivery, alt: "Projeto Delivery" },
-                      { src: projectErp, alt: "Projeto ERP" },
+                      { src: projectArcanjo, alt: "Arcanjo Sociedade de Advogados", url: "https://www.arcanjoadvogados.com.br/" },
+                      { src: projectBaile55, alt: "Baile 55", url: "https://baile55.com/" },
+                      { src: projectConsultec, alt: "Consultec", url: "https://www.consultecsolucoes.com/" },
+                      { src: projectJardins, alt: "Jardins Dona Isabel", url: "https://www.jardinsdonaisabel.com.br/" },
+                      { src: projectKidstogether, alt: "Kids2gether", url: "https://www.kids2gether.com.br/" },
+                      { src: projectMeiodomato, alt: "Meio do Mato Eventos", url: "https://lp.meiodomato.com.br/" },
+                      { src: projectServitec, alt: "Servitec Dinamômetro", url: "https://www.servitecdinamometro.com.br/" },
                     ];
                     // Duplicar sequência para loop suave
                     const sequence = [...baseImages, ...baseImages];
                     return Array.from({ length: 4 }).flatMap((_, setIndex) =>
                       sequence.map((img, i) => (
                         <div key={`set${setIndex}-${i}`} className="carousel-item">
-                          <img
-                            src={img.src}
-                            alt={setIndex === 0 ? img.alt : ""}
-                            loading="lazy"
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              (e.currentTarget as HTMLImageElement).style.opacity = '0.3';
-                            }}
-                          />
+                          <a
+                            href={img.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`Abrir site ${img.alt} em nova aba`}
+                            className="block w-full h-full"
+                          >
+                            <img
+                              src={img.src}
+                              alt={setIndex === 0 ? img.alt : ""}
+                              loading="lazy"
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                (e.currentTarget as HTMLImageElement).style.opacity = '0.3';
+                              }}
+                            />
+                          </a>
                         </div>
                       ))
                     );
