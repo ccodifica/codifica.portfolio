@@ -73,12 +73,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.log("[auth] getSession resolved", {
           hasSession: !!data.session,
         });
-        if (mounted) setSession(data.session);
+        if (!mounted) return;
+        setSession(data.session);
+        // Sem sessão → já encerra o loading (não vai ter profile pra carregar).
+        // Com sessão → mantém isLoading=true até o profile carregar, evitando
+        // que o guard redirecione pro /login no F5 enquanto o profile não chega.
+        if (!data.session) setIsLoading(false);
       })
       .catch((err) => {
         console.error("[auth] getSession FAILED", err);
-      })
-      .finally(() => {
         if (mounted) setIsLoading(false);
       });
 
@@ -92,7 +95,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         event,
         hasSession: !!newSession,
       });
-      if (mounted) setSession(newSession);
+      if (!mounted) return;
+      setSession(newSession);
+      if (!newSession) setIsLoading(false);
     });
 
     return () => {
@@ -116,6 +121,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           role: profile?.role,
         });
         setUser(profile);
+        // Profile chegou (ou falhou definitivamente) — agora sim liberamos
+        // o app pra renderizar. Antes disso, isLoading=true mantém o guard
+        // em "esperando" em vez de redirecionar pro /login.
+        setIsLoading(false);
       }
     })();
     return () => {

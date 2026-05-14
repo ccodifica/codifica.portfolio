@@ -1,5 +1,13 @@
 export type UserRole = "cliente" | "admin";
 
+export type PresenceStatus = "available" | "away" | "busy";
+
+export const PRESENCE_LABEL: Record<PresenceStatus, string> = {
+  available: "Disponível",
+  away: "Ausente",
+  busy: "Ocupado",
+};
+
 export interface User {
   id: string;
   nome: string;
@@ -9,6 +17,8 @@ export interface User {
   cargo?: string;
   ramo?: string;
   role: UserRole;
+  avatarUrl?: string;
+  presenceStatus: PresenceStatus;
   createdAt: string;
 }
 
@@ -134,6 +144,14 @@ export interface MessageAttachment {
   data: string; // data URL base64 (Fase 1A); na Fase 1B virará URL do Storage
 }
 
+export interface MessageReaction {
+  id: string;
+  messageId: string;
+  userId: string;
+  emoji: string;
+  createdAt: string;
+}
+
 export interface ChatMessage {
   id: string;
   projectId: string;
@@ -142,6 +160,7 @@ export interface ChatMessage {
   autorNome: string;
   texto: string;
   anexos?: MessageAttachment[];
+  reactions?: MessageReaction[];
   createdAt: string;
 }
 
@@ -169,7 +188,10 @@ export interface Meeting {
   topico: string;
   notificarEmail: boolean;
   notificarWhatsapp: boolean;
+  participantesExtras: string[]; // emails extras convidados; Codifica é incluída no backend
   meetLink?: string;
+  googleEventId?: string; // id do evento no Google Calendar (para update/cancel)
+  gravacaoUrl?: string; // link da gravação (Drive/Loom/upload manual) — preenchido pelo admin
   status: MeetingStatus;
   observacoes?: string;
   createdAt: string;
@@ -188,6 +210,27 @@ export interface ProjectEvent {
   createdAt: string;
 }
 
+export interface EtapaDocumentacao {
+  resumo: string;
+  entregaveis: string;
+  pontosAtencao: string;
+  proximosPassos: string;
+  concluidoEm?: string; // ISO date — auto-preenchido quando admin avança a fase
+  publicado: boolean; // false = rascunho do admin; true = visível ao cliente
+}
+
+export type DocumentacoesProjeto = Partial<
+  Record<ProjectStatus, EtapaDocumentacao>
+>;
+
+export const EMPTY_ETAPA_DOC: EtapaDocumentacao = {
+  resumo: "",
+  entregaveis: "",
+  pontosAtencao: "",
+  proximosPassos: "",
+  publicado: false,
+};
+
 export interface Project {
   id: string;
   clienteId: string;
@@ -197,6 +240,7 @@ export interface Project {
   progresso: number; // 0-100
   briefing: QuestionnaireData;
   notasAdmin?: string;
+  documentacoes: DocumentacoesProjeto;
   createdAt: string;
   updatedAt: string;
 }

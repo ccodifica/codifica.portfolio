@@ -1,5 +1,6 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { PresenceProvider } from "@/contexts/PresenceContext";
 import { ReactNode } from "react";
 
 export const RequireAuth = ({ children }: { children: ReactNode }) => {
@@ -15,7 +16,7 @@ export const RequireAuth = ({ children }: { children: ReactNode }) => {
       />
     );
   }
-  return <>{children}</>;
+  return <PresenceProvider>{children}</PresenceProvider>;
 };
 
 export const RequireAdmin = ({ children }: { children: ReactNode }) => {
@@ -25,5 +26,5 @@ export const RequireAdmin = ({ children }: { children: ReactNode }) => {
   if (user.role !== "admin") {
     return <Navigate to="/espaco-do-cliente/painel" replace />;
   }
-  return <>{children}</>;
+  return <PresenceProvider>{children}</PresenceProvider>;
 };
