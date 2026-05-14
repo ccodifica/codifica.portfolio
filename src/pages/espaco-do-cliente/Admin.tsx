@@ -21,6 +21,12 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
   ArrowLeft,
   LogOut,
   MessageSquare,
@@ -32,11 +38,11 @@ import {
   Activity,
   FileText,
   CalendarDays,
-  Trash2,
-  Plus,
   Video,
   Clock,
   ExternalLink,
+  History,
+  CalendarClock,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -47,16 +53,12 @@ import {
   PROJECT_STATUS_ORDER,
   PROJECT_TYPE_LABEL,
   Project,
-  ProjectEvent,
   ProjectStatus,
   User,
 } from "@/types/client-area";
 import {
   MEETING_STATUS_BADGES,
   STATUS_PROGRESS_MAP,
-  createEvent,
-  deleteEvent,
-  listEventsByProject,
   listMeetings,
   listMeetingsByProject,
   listProjects,
@@ -73,6 +75,11 @@ import {
   buildWhatsappLink,
   formatDataBR,
 } from "./_shared";
+import {
+  DocumentacaoEtapasAdmin,
+  DownloadDocPdfButton,
+} from "./_documentacao";
+import { usePresence } from "@/contexts/PresenceContext";
 import { emailService } from "@/services/emailService";
 
 type ListaTab = "andamento" | "concluido";
@@ -212,6 +219,7 @@ const Admin = () => {
                 cliente={usuarios.find((u) => u.id === selecionado.clienteId)}
                 adminId={user!.id}
                 adminName={user!.nome}
+                adminAvatarUrl={user!.avatarUrl}
                 onBack={() => {
                   setSelectedId(null);
                   reload();
@@ -424,6 +432,7 @@ const AdminProjectDetail = ({
   cliente,
   adminId,
   adminName,
+  adminAvatarUrl,
   onBack,
   onAfterChange,
 }: {
@@ -431,9 +440,11 @@ const AdminProjectDetail = ({
   cliente?: User;
   adminId: string;
   adminName: string;
+  adminAvatarUrl?: string;
   onBack: () => void;
   onAfterChange: () => void;
 }) => {
+  const { effectiveStatus: minhaPresenca } = usePresence();
   return (
     <div className="space-y-6">
       <Button
@@ -491,6 +502,7 @@ const AdminProjectDetail = ({
         <TabsContent value="andamento" className="mt-6">
           <AndamentoTab
             project={project}
+            cliente={cliente}
             adminId={adminId}
             adminName={adminName}
             onAfterChange={onAfterChange}
@@ -499,7 +511,10 @@ const AdminProjectDetail = ({
 
         <TabsContent value="briefing" className="mt-6">
           <div className="p-6 md:p-8 rounded-2xl border border-border/60 bg-card/50">
-            <BriefingDisplay briefing={project.briefing} />
+            <BriefingDisplay
+              briefing={project.briefing}
+              avatarUrl={cliente?.avatarUrl}
+            />
           </div>
         </TabsContent>
 
@@ -528,6 +543,8 @@ const AdminProjectDetail = ({
               userId={adminId}
               userName={adminName}
               userRole="admin"
+              userAvatarUrl={adminAvatarUrl}
+              userPresence={minhaPresenca}
             />
           </div>
         </TabsContent>
@@ -538,11 +555,13 @@ const AdminProjectDetail = ({
 
 const AndamentoTab = ({
   project,
+  cliente,
   adminId,
   adminName,
   onAfterChange,
 }: {
   project: Project;
+  cliente?: User;
   adminId: string;
   adminName: string;
   onAfterChange: () => void;
@@ -551,36 +570,10 @@ const AndamentoTab = ({
   const [status, setStatus] = useState<ProjectStatus>(project.status);
   const [progresso, setProgresso] = useState<number>(project.progresso);
   const [notas, setNotas] = useState(project.notasAdmin ?? "");
-  const [eventos, setEventos] = useState<ProjectEvent[]>([]);
-  const [novoEventoTitulo, setNovoEventoTitulo] = useState("");
-  const [novoEventoDescricao, setNovoEventoDescricao] = useState("");
-  const [novoEventoFase, setNovoEventoFase] = useState<ProjectStatus>(
-    project.status
-  );
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const evs = await listEventsByProject(project.id);
-        if (!cancelled) setEventos(evs);
-      } catch (err) {
-        if (!cancelled) {
-          const msg =
-            err instanceof Error ? err.message : "Erro ao carregar registros.";
-          toast.error(msg);
-        }
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [project.id]);
 
   const handleStatusChange = (s: ProjectStatus) => {
     setStatus(s);
     setProgresso(STATUS_PROGRESS_MAP[s]);
-    setNovoEventoFase(s);
   };
 
   const salvar = async () => {
@@ -595,41 +588,6 @@ const AndamentoTab = ({
       onAfterChange();
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erro ao salvar.";
-      toast.error(msg);
-    }
-  };
-
-  const adicionarEvento = async () => {
-    if (!novoEventoTitulo.trim()) {
-      toast.error("Dê um título para o registro.");
-      return;
-    }
-    try {
-      const novo = await createEvent({
-        projectId: project.id,
-        fase: novoEventoFase,
-        titulo: novoEventoTitulo.trim(),
-        descricao: novoEventoDescricao.trim(),
-        autorId: adminId,
-        autorRole: "admin",
-        autorNome: adminName,
-      });
-      setEventos((evs) => [novo, ...evs]);
-      setNovoEventoTitulo("");
-      setNovoEventoDescricao("");
-      toast.success("Registro adicionado.");
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Erro ao adicionar.";
-      toast.error(msg);
-    }
-  };
-
-  const removerEvento = async (id: string) => {
-    try {
-      await deleteEvent(id);
-      setEventos((evs) => evs.filter((e) => e.id !== id));
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Erro ao remover.";
       toast.error(msg);
     }
   };
@@ -652,43 +610,26 @@ const AndamentoTab = ({
               />
             </div>
 
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div>
-                <Label>Status</Label>
-                <Select
-                  value={status}
-                  onValueChange={(v) =>
-                    handleStatusChange(v as ProjectStatus)
-                  }
-                >
-                  <SelectTrigger className="mt-2">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PROJECT_STATUS_ORDER.map((s) => (
-                      <SelectItem key={s} value={s}>
-                        {PROJECT_STATUS_LABEL[s]}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="progresso">Progresso (%)</Label>
-                <Input
-                  id="progresso"
-                  type="number"
-                  min={0}
-                  max={100}
-                  value={progresso}
-                  onChange={(e) =>
-                    setProgresso(
-                      Math.max(0, Math.min(100, Number(e.target.value) || 0))
-                    )
-                  }
-                  className="mt-2"
-                />
-              </div>
+            <div>
+              <Label>Status atual do projeto</Label>
+              <Select
+                value={status}
+                onValueChange={(v) => handleStatusChange(v as ProjectStatus)}
+              >
+                <SelectTrigger className="mt-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {PROJECT_STATUS_ORDER.map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {PROJECT_STATUS_LABEL[s]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground mt-1.5">
+                Avançar o status atualiza a barrinha automaticamente ({progresso}%).
+              </p>
             </div>
 
             <Progress value={progresso} className="h-2" />
@@ -718,100 +659,31 @@ const AndamentoTab = ({
         </div>
 
         <div className="p-6 md:p-8 rounded-2xl border border-border/60 bg-card/50">
-          <div className="flex items-center justify-between mb-5">
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-              Registros de andamento (visíveis ao cliente)
-            </h3>
-          </div>
-
-          <div className="p-4 rounded-lg bg-muted/30 border border-border/40 mb-5 space-y-3">
-            <div className="grid sm:grid-cols-2 gap-3">
-              <div>
-                <Label className="text-xs">Fase</Label>
-                <Select
-                  value={novoEventoFase}
-                  onValueChange={(v) => setNovoEventoFase(v as ProjectStatus)}
-                >
-                  <SelectTrigger className="mt-1 h-9 text-sm">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PROJECT_STATUS_ORDER.map((s) => (
-                      <SelectItem key={s} value={s}>
-                        {PROJECT_STATUS_LABEL[s]}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="text-xs">Título do registro</Label>
-                <Input
-                  value={novoEventoTitulo}
-                  onChange={(e) => setNovoEventoTitulo(e.target.value)}
-                  placeholder="Ex.: Briefing aprovado"
-                  className="mt-1 h-9 text-sm"
-                />
-              </div>
-            </div>
+          <div className="flex items-center justify-between gap-3 mb-5">
             <div>
-              <Label className="text-xs">Descrição (opcional)</Label>
-              <Textarea
-                value={novoEventoDescricao}
-                onChange={(e) => setNovoEventoDescricao(e.target.value)}
-                placeholder="Detalhes que o cliente vai ver no painel..."
-                rows={2}
-                className="mt-1 resize-none text-sm"
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                Documentação das etapas (visíveis ao cliente)
+              </h3>
+              <p className="text-xs text-muted-foreground mt-1">
+                Preencha conforme avança no projeto. O cliente vê uma versão
+                somente leitura no painel dele, e pode baixar o PDF.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <DownloadDocPdfButton
+                project={project}
+                clienteNome={cliente?.nome}
+                mode="template"
+                variant="ghost"
+              />
+              <DownloadDocPdfButton
+                project={project}
+                clienteNome={cliente?.nome}
+                mode="completo"
               />
             </div>
-            <Button
-              onClick={adicionarEvento}
-              size="sm"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Adicionar registro
-            </Button>
           </div>
-
-          {eventos.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-6">
-              Nenhum registro ainda. O primeiro vai aparecer no painel do
-              cliente como histórico.
-            </p>
-          ) : (
-            <ul className="space-y-4">
-              {eventos.map((e) => (
-                <li
-                  key={e.id}
-                  className="border-l-2 border-primary/40 pl-4 pb-1 group"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs text-muted-foreground mb-0.5">
-                        {PROJECT_STATUS_LABEL[e.fase]} ·{" "}
-                        {new Date(e.createdAt).toLocaleDateString("pt-BR")}
-                      </div>
-                      <div className="font-semibold text-sm">{e.titulo}</div>
-                      {e.descricao && (
-                        <div className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">
-                          {e.descricao}
-                        </div>
-                      )}
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => removerEvento(e.id)}
-                      className="text-muted-foreground/50 hover:text-destructive p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                      title="Remover registro"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
+          <DocumentacaoEtapasAdmin project={project} onSaved={onAfterChange} />
         </div>
       </div>
 
@@ -857,6 +729,17 @@ const ReuniaoTab = ({
     };
   }, [project.id]);
 
+  const recarregar = async () => {
+    try {
+      const ms = await listMeetingsByProject(project.id);
+      setMeetings(ms);
+      onAfterChange();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Erro ao recarregar.";
+      toast.error(msg);
+    }
+  };
+
   if (meetings.length === 0) {
     return (
       <div className="p-8 rounded-2xl border border-border/60 bg-card/50 text-center">
@@ -874,28 +757,123 @@ const ReuniaoTab = ({
     );
   }
 
-  const recarregar = async () => {
-    try {
-      const ms = await listMeetingsByProject(project.id);
-      setMeetings(ms);
-      onAfterChange();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Erro ao recarregar.";
-      toast.error(msg);
-    }
-  };
+  // Próximas: tudo que não foi cancelada nem realizada (admin precisa agir nelas).
+  const proximas = meetings
+    .filter((m) => m.status !== "cancelada" && m.status !== "realizada")
+    .sort((a, b) =>
+      a.data === b.data
+        ? a.horario.localeCompare(b.horario)
+        : a.data.localeCompare(b.data)
+    );
+
+  // Arquivadas: canceladas e realizadas (referência / edição pós-reunião).
+  const arquivadas = meetings
+    .filter((m) => m.status === "cancelada" || m.status === "realizada")
+    .sort((a, b) =>
+      a.data === b.data
+        ? b.horario.localeCompare(a.horario)
+        : b.data.localeCompare(a.data)
+    );
 
   return (
-    <div className="grid gap-4">
-      {meetings.map((m) => (
-        <MeetingAdminCard
-          key={m.id}
-          meeting={m}
-          cliente={cliente}
-          projectName={project.nome}
-          onSaved={recarregar}
-        />
-      ))}
+    <div className="space-y-8">
+      <section>
+        <div className="flex items-center gap-3 mb-4 pb-3 border-b border-border/40">
+          <div className="w-9 h-9 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center">
+            <CalendarClock className="w-4 h-4 text-primary" />
+          </div>
+          <div>
+            <h3 className="text-base font-bold leading-tight">
+              Ativas e próximas
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              {proximas.length === 0
+                ? "Sem reuniões aguardando ação no momento."
+                : `${proximas.length} reuni${proximas.length === 1 ? "ão" : "ões"} a acompanhar (agendada/confirmada/remarcada).`}
+            </p>
+          </div>
+        </div>
+
+        {proximas.length === 0 ? (
+          <div className="p-6 rounded-2xl border border-dashed border-border/50 bg-card/30 text-center text-sm text-muted-foreground">
+            Nada por aqui — o cliente ainda não agendou uma reunião nova.
+          </div>
+        ) : (
+          <div className="grid gap-4">
+            {proximas.map((m) => (
+              <MeetingAdminCard
+                key={m.id}
+                meeting={m}
+                cliente={cliente}
+                projectName={project.nome}
+                onSaved={recarregar}
+              />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {arquivadas.length > 0 && (
+        <section>
+          <div className="flex items-center gap-3 mb-4 pb-3 border-b border-border/40">
+            <div className="w-9 h-9 rounded-lg bg-muted/40 border border-border/60 flex items-center justify-center">
+              <History className="w-4 h-4 text-muted-foreground" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold leading-tight">
+                Histórico — canceladas e realizadas
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                {arquivadas.length} reuni{arquivadas.length === 1 ? "ão" : "ões"}{" "}
+                arquivada{arquivadas.length === 1 ? "" : "s"}. Ainda dá pra editar status, anexar gravação ou ajustar observações.
+              </p>
+            </div>
+          </div>
+
+          <Accordion type="single" collapsible className="space-y-2">
+            {arquivadas.map((m) => (
+              <AccordionItem
+                key={m.id}
+                value={m.id}
+                className="border border-border/40 rounded-xl bg-card/40 px-4 data-[state=open]:bg-card/60 data-[state=open]:border-border/60 transition-colors"
+              >
+                <AccordionTrigger className="hover:no-underline py-3 [&[data-state=open]>div>span.chevron-hint]:hidden">
+                  <div className="flex flex-1 items-center justify-between gap-3 pr-2 text-left">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="text-sm font-semibold whitespace-nowrap">
+                        {formatDataBR(m.data)}
+                        <span className="text-muted-foreground font-normal">
+                          {" "}
+                          · {m.horario}
+                        </span>
+                      </div>
+                      {m.topico && (
+                        <span className="text-xs text-muted-foreground truncate hidden sm:inline">
+                          — {m.topico}
+                        </span>
+                      )}
+                    </div>
+                    <span
+                      className={`text-[10px] uppercase tracking-wide font-semibold px-2 py-0.5 rounded-full border whitespace-nowrap ${MEETING_STATUS_BADGES[m.status]}`}
+                    >
+                      {MEETING_STATUS_LABEL[m.status]}
+                    </span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pt-2 pb-4">
+                  <MeetingAdminCard
+                    meeting={m}
+                    cliente={cliente}
+                    projectName={project.nome}
+                    onSaved={recarregar}
+                    embedded
+                  />
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </section>
+      )}
     </div>
   );
 };
@@ -905,11 +883,13 @@ const MeetingAdminCard = ({
   cliente,
   projectName,
   onSaved,
+  embedded = false,
 }: {
   meeting: Meeting;
   cliente?: User;
   projectName: string;
   onSaved: () => void;
+  embedded?: boolean;
 }) => {
   const [status, setStatus] = useState<MeetingStatus>(meeting.status);
   const [meetLink, setMeetLink] = useState(meeting.meetLink ?? "");
@@ -963,24 +943,32 @@ const MeetingAdminCard = ({
     : "";
 
   return (
-    <div className="p-6 md:p-8 rounded-2xl border border-border/60 bg-card/50">
-      <div className="flex items-start justify-between gap-4 mb-5">
-        <div>
-          <div className="text-xs font-medium text-muted-foreground mb-1">
-            Reunião com {cliente?.nome ?? "cliente"}
+    <div
+      className={
+        embedded
+          ? "p-0"
+          : "p-6 md:p-8 rounded-2xl border border-border/60 bg-card/50"
+      }
+    >
+      {!embedded && (
+        <div className="flex items-start justify-between gap-4 mb-5">
+          <div>
+            <div className="text-xs font-medium text-muted-foreground mb-1">
+              Reunião com {cliente?.nome ?? "cliente"}
+            </div>
+            <h3 className="text-xl font-bold">{formatDataBR(data)}</h3>
+            <div className="text-muted-foreground flex items-center gap-1 mt-1">
+              <Clock className="w-4 h-4" />
+              <span>{horario}</span>
+            </div>
           </div>
-          <h3 className="text-xl font-bold">{formatDataBR(data)}</h3>
-          <div className="text-muted-foreground flex items-center gap-1 mt-1">
-            <Clock className="w-4 h-4" />
-            <span>{horario}</span>
-          </div>
+          <span
+            className={`text-xs font-medium px-3 py-1 rounded-full border whitespace-nowrap ${MEETING_STATUS_BADGES[status]}`}
+          >
+            {MEETING_STATUS_LABEL[status]}
+          </span>
         </div>
-        <span
-          className={`text-xs font-medium px-3 py-1 rounded-full border whitespace-nowrap ${MEETING_STATUS_BADGES[status]}`}
-        >
-          {MEETING_STATUS_LABEL[status]}
-        </span>
-      </div>
+      )}
 
       {meeting.topico && (
         <div className="mb-5 p-3 rounded-lg bg-muted/40 border border-border/40">

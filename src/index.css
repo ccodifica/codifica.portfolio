@@ -1005,3 +1005,15 @@
     background: radial-gradient(var(--tw-gradient-stops));
   }
 }
+
+/* Keyframe global usado em animations inline (style={{ animation: ... }}) */
+@keyframes fadeInTimelineItem {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

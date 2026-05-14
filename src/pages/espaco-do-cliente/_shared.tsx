@@ -18,23 +18,36 @@ import {
   Mail,
   MessageCircle,
   Save,
+  Users,
+  Plus,
+  Smile,
 } from "lucide-react";
+import EmojiPicker, { Theme, EmojiStyle } from "emoji-picker-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   ChatMessage,
   MessageAttachment,
   PROJECT_STATUS_LABEL,
   PROJECT_STATUS_ORDER,
+  PresenceStatus,
   ProjectStatus,
-  QuestionnaireData,
   UserRole,
 } from "@/types/client-area";
 import {
   MAX_ATTACHMENT_BYTES,
   createMessage,
+  getUsersByIds,
   listMessagesByProject,
+  toggleMessageReaction,
 } from "@/lib/client-area-store";
 import { supabase } from "@/lib/supabase";
 import { toast } from "@/components/ui/sonner";
+import { UserAvatar } from "./_user-avatar";
+import { AttachmentViewer } from "./_attachment-viewer";
 
 export const HORARIOS_DISPONIVEIS = [
   "09:00",
@@ -122,104 +135,327 @@ export function TimelineEtapas({
   );
 }
 
+// Reações rápidas no popover do botão
+const QUICK_REACTIONS = ["👍", "❤️", "😂", "🎉", "🙏", "🔥"] as const;
+
 export function MessageBubble({
   message,
   mineId,
+  mineAvatarUrl,
+  mineName,
+  minePresence,
+  autorAvatarUrl,
+  autorPresence,
+  isPrimeiraDoGrupo = true,
+  isUltimaDoGrupo = true,
+  onReact,
+  onAttachmentOpen,
 }: {
   message: ChatMessage;
   mineId: string;
+  mineAvatarUrl?: string;
+  mineName?: string;
+  minePresence?: PresenceStatus;
+  autorAvatarUrl?: string;
+  autorPresence?: PresenceStatus;
+  isPrimeiraDoGrupo?: boolean;
+  isUltimaDoGrupo?: boolean;
+  onReact?: (messageId: string, emoji: string) => void;
+  onAttachmentOpen?: (attachment: MessageAttachment) => void;
 }) {
   const isMine = message.autorId === mineId;
+  const isAdmin = message.autorRole === "admin";
+
+  const formatHora = (iso: string) =>
+    new Date(iso).toLocaleString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+  // Agrupa reações por emoji pra mostrar "👍 2 · ❤️ 1"
+  const reacoesAgrupadas = (() => {
+    const out: Record<
+      string,
+      { count: number; userIds: string[]; mineSelected: boolean }
+    > = {};
+    for (const r of message.reactions ?? []) {
+      if (!out[r.emoji]) {
+        out[r.emoji] = { count: 0, userIds: [], mineSelected: false };
+      }
+      out[r.emoji].count++;
+      out[r.emoji].userIds.push(r.userId);
+      if (r.userId === mineId) out[r.emoji].mineSelected = true;
+    }
+    return out;
+  })();
+  const temReacoes = Object.keys(reacoesAgrupadas).length > 0;
+
+  // Avatar — quem aparece ao lado do bubble
+  const avatarParaMostrar = isMine ? mineAvatarUrl : autorAvatarUrl;
+  const nomeParaAvatar = isMine ? mineName ?? "Você" : message.autorNome;
+  const presenceParaMostrar = isMine ? minePresence : autorPresence;
+
   return (
-    <div className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
+    <div
+      className={`group flex items-end gap-2 ${
+        isMine ? "flex-row-reverse" : ""
+      } ${isPrimeiraDoGrupo ? "mt-4" : "mt-0.5"}`}
+    >
+      {/* Avatar: aparece só na última msg do grupo, slot reservado no resto */}
+      <div className="w-9 h-9 flex-shrink-0">
+        {isUltimaDoGrupo && (
+          <UserAvatar
+            nome={nomeParaAvatar}
+            avatarUrl={avatarParaMostrar}
+            presenceStatus={presenceParaMostrar}
+            size="sm"
+          />
+        )}
+      </div>
+
       <div
-        className={`max-w-[85%] rounded-2xl px-4 py-2.5 ${
-          isMine
-            ? "bg-primary text-primary-foreground"
-            : message.autorRole === "admin"
-            ? "bg-accent/15 text-foreground border border-accent/30"
-            : "bg-muted text-foreground"
+        className={`flex flex-col max-w-[78%] ${
+          isMine ? "items-end" : "items-start"
         }`}
       >
-        {!isMine && (
-          <div className="text-xs font-semibold mb-1 opacity-80">
-            {message.autorNome}
-            {message.autorRole === "admin" && " · Codifica"}
+        {/* Linha bubble + botão de reagir */}
+        <div
+          className={`flex items-center gap-1.5 ${
+            isMine ? "flex-row-reverse" : ""
+          }`}
+        >
+          <div
+            className={`px-4 py-2.5 rounded-2xl ${
+              isMine
+                ? "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground rounded-br-md shadow-sm shadow-primary/10"
+                : isAdmin
+                ? "bg-accent/10 border border-accent/25 text-foreground rounded-tl-md"
+                : "bg-muted/70 border border-border/40 text-foreground rounded-tl-md"
+            }`}
+          >
+            {!isMine && isPrimeiraDoGrupo && (
+              <div className="text-xs font-semibold mb-1 opacity-80">
+                {message.autorNome}
+                {isAdmin && " · Codifica"}
+              </div>
+            )}
+            {message.texto && (
+              <div className="text-sm whitespace-pre-wrap break-words leading-relaxed">
+                {message.texto}
+              </div>
+            )}
+            {message.anexos && message.anexos.length > 0 && (
+              <div className={`${message.texto ? "mt-2" : ""} space-y-2`}>
+                {message.anexos.map((a) => (
+                  <AttachmentChip
+                    key={a.id}
+                    attachment={a}
+                    mine={isMine}
+                    onOpen={onAttachmentOpen}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-        )}
-        {message.texto && (
-          <div className="text-sm whitespace-pre-wrap break-words">
-            {message.texto}
-          </div>
-        )}
-        {message.anexos && message.anexos.length > 0 && (
-          <div className="mt-2 space-y-2">
-            {message.anexos.map((a) => (
-              <AttachmentChip key={a.id} attachment={a} mine={isMine} />
+
+          {/* Botão "reagir" — só aparece no hover do grupo, click abre popover */}
+          {onReact && (
+            <ReactionButton
+              isMine={isMine}
+              onSelect={(emoji) => onReact(message.id, emoji)}
+            />
+          )}
+        </div>
+
+        {/* Chips de reações existentes */}
+        {temReacoes && (
+          <div
+            className={`flex flex-wrap gap-1 mt-1.5 ${
+              isMine ? "justify-end" : "justify-start"
+            }`}
+          >
+            {Object.entries(reacoesAgrupadas).map(([emoji, info]) => (
+              <button
+                key={emoji}
+                type="button"
+                onClick={() => onReact?.(message.id, emoji)}
+                title={`${info.count} ${info.count === 1 ? "pessoa reagiu" : "pessoas reagiram"}`}
+                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs transition-all hover:scale-105 ${
+                  info.mineSelected
+                    ? "bg-primary/15 border-primary/40 text-foreground"
+                    : "bg-muted/40 border-border/60 hover:bg-muted/60"
+                }`}
+              >
+                <span className="text-[13px] leading-none">{emoji}</span>
+                <span className="tabular-nums text-[11px] font-semibold">
+                  {info.count}
+                </span>
+              </button>
             ))}
           </div>
         )}
-        <div
-          className={`text-[10px] mt-1 ${
-            isMine ? "text-primary-foreground/70" : "text-muted-foreground"
-          }`}
-        >
-          {new Date(message.createdAt).toLocaleString("pt-BR", {
-            day: "2-digit",
-            month: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-        </div>
+
+        {isUltimaDoGrupo && (
+          <div className="text-[10px] text-muted-foreground mt-1 px-1 tabular-nums">
+            {formatHora(message.createdAt)}
+          </div>
+        )}
       </div>
     </div>
+  );
+}
+
+// Botão "reagir" — aparece no hover do grupo da mensagem.
+// Click abre um Popover com 6 emojis quick + opção "Mais..." que troca pro
+// EmojiPicker completo. Usar Popover (controlado) resolve o "hover gap" do
+// padrão anterior: o picker fica aberto até o user clicar fora ou num emoji.
+function ReactionButton({
+  isMine,
+  onSelect,
+}: {
+  isMine: boolean;
+  onSelect: (emoji: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [mostrarPickerCompleto, setMostrarPickerCompleto] = useState(false);
+
+  const handleSelect = (emoji: string) => {
+    onSelect(emoji);
+    setOpen(false);
+    setMostrarPickerCompleto(false);
+  };
+
+  return (
+    <Popover
+      open={open}
+      onOpenChange={(o) => {
+        setOpen(o);
+        if (!o) setMostrarPickerCompleto(false);
+      }}
+    >
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          aria-label="Reagir à mensagem"
+          className={`w-7 h-7 rounded-full bg-card border border-border/60 hover:bg-muted hover:border-border shadow-sm flex items-center justify-center transition-all ${
+            open
+              ? "opacity-100"
+              : "opacity-0 group-hover:opacity-100 focus:opacity-100"
+          }`}
+        >
+          <Smile className="w-3.5 h-3.5 text-muted-foreground" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        align={isMine ? "end" : "start"}
+        side="top"
+        sideOffset={6}
+        className={
+          mostrarPickerCompleto
+            ? "p-0 w-auto border-border/60"
+            : "p-1.5 w-auto border-border/60"
+        }
+      >
+        {mostrarPickerCompleto ? (
+          <EmojiPicker
+            theme={Theme.DARK}
+            emojiStyle={EmojiStyle.NATIVE}
+            skinTonesDisabled
+            searchPlaceHolder="Buscar emoji..."
+            previewConfig={{ showPreview: false }}
+            onEmojiClick={(data) => handleSelect(data.emoji)}
+            width={320}
+            height={380}
+          />
+        ) : (
+          <div className="flex items-center gap-0.5">
+            {QUICK_REACTIONS.map((emoji) => (
+              <button
+                key={emoji}
+                type="button"
+                onClick={() => handleSelect(emoji)}
+                className="w-8 h-8 rounded-full hover:bg-muted/60 flex items-center justify-center text-base transition-transform hover:scale-125"
+                aria-label={`Reagir com ${emoji}`}
+              >
+                {emoji}
+              </button>
+            ))}
+            <div className="w-px h-5 bg-border/60 mx-0.5" />
+            <button
+              type="button"
+              onClick={() => setMostrarPickerCompleto(true)}
+              className="w-8 h-8 rounded-full hover:bg-muted/60 flex items-center justify-center transition-colors"
+              aria-label="Mais emojis"
+              title="Mais emojis"
+            >
+              <Plus className="w-3.5 h-3.5 text-muted-foreground" />
+            </button>
+          </div>
+        )}
+      </PopoverContent>
+    </Popover>
   );
 }
 
 function AttachmentChip({
   attachment,
   mine,
+  onOpen,
 }: {
   attachment: MessageAttachment;
   mine: boolean;
+  onOpen?: (attachment: MessageAttachment) => void;
 }) {
   const isImage = attachment.fileType.startsWith("image/");
   const sizeKB = Math.max(1, Math.round(attachment.fileSize / 1024));
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onOpen?.(attachment);
+  };
+
   if (isImage) {
     return (
-      <a
-        href={attachment.data}
-        download={attachment.fileName}
-        target="_blank"
-        rel="noreferrer"
-        className="block rounded-lg overflow-hidden border border-border/30 max-w-xs"
-        title={attachment.fileName}
+      <button
+        type="button"
+        onClick={handleClick}
+        className="block rounded-lg overflow-hidden border border-border/30 max-w-xs group/img relative"
+        title={`Abrir ${attachment.fileName}`}
       >
         <img
           src={attachment.data}
           alt={attachment.fileName}
-          className="block max-h-48 w-auto"
+          className="block max-h-48 w-auto transition-transform duration-300 group-hover/img:scale-[1.02]"
         />
-      </a>
+        {/* Overlay sutil no hover */}
+        <span
+          aria-hidden
+          className="absolute inset-0 bg-black/0 group-hover/img:bg-black/20 transition-colors flex items-center justify-center"
+        >
+          <span className="opacity-0 group-hover/img:opacity-100 transition-opacity text-white text-xs font-semibold bg-black/60 px-2 py-1 rounded-md backdrop-blur-sm">
+            Clique para abrir
+          </span>
+        </span>
+      </button>
     );
   }
 
   return (
-    <a
-      href={attachment.data}
-      download={attachment.fileName}
-      className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs transition-colors ${
+    <button
+      type="button"
+      onClick={handleClick}
+      className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs transition-colors text-left w-full ${
         mine
           ? "bg-primary-foreground/10 hover:bg-primary-foreground/15 text-primary-foreground"
           : "bg-background/50 hover:bg-background/80 text-foreground border border-border/40"
       }`}
+      title={`Abrir ${attachment.fileName}`}
     >
       <FileText className="w-4 h-4 flex-shrink-0" />
       <span className="flex-1 truncate font-medium">{attachment.fileName}</span>
       <span className="opacity-70 whitespace-nowrap">{sizeKB} KB</span>
-      <Download className="w-3.5 h-3.5 flex-shrink-0 opacity-70" />
-    </a>
+    </button>
   );
 }
 
@@ -228,15 +464,27 @@ export function ChatPanel({
   userId,
   userName,
   userRole,
+  userAvatarUrl,
+  userPresence,
   emptyHint,
 }: {
   projectId: string;
   userId: string;
   userName: string;
   userRole: UserRole;
+  userAvatarUrl?: string;
+  userPresence?: PresenceStatus;
   emptyHint?: string;
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [avatarMap, setAvatarMap] = useState<Record<string, string | undefined>>(
+    {}
+  );
+  const [presenceMap, setPresenceMap] = useState<
+    Record<string, PresenceStatus | undefined>
+  >({});
+  const [viewingAttachment, setViewingAttachment] =
+    useState<MessageAttachment | null>(null);
   const [texto, setTexto] = useState("");
   const [anexos, setAnexos] = useState<File[]>([]);
   const [enviando, setEnviando] = useState(false);
@@ -279,6 +527,21 @@ export function ChatPanel({
           if (!cancelled) carregar();
         }
       )
+      // Recarrega quando reações são inseridas/removidas em qualquer
+      // mensagem (não dá pra filtrar por project_id direto aqui — a tabela
+      // de reações não tem essa coluna, então pega tudo e o carregar() já
+      // faz join com as msgs deste projeto)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "message_reactions",
+        },
+        () => {
+          if (!cancelled) carregar();
+        }
+      )
       .subscribe();
 
     return () => {
@@ -286,6 +549,78 @@ export function ChatPanel({
       supabase.removeChannel(channel);
     };
   }, [projectId]);
+
+  // Mantém cache local de avatares + status de presença dos autores. Recarrega
+  // quando aparecem autorIds novos.
+  useEffect(() => {
+    const idsUnicos = Array.from(new Set(messages.map((m) => m.autorId)));
+    if (idsUnicos.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const users = await getUsersByIds(idsUnicos);
+        if (cancelled) return;
+        setAvatarMap((prev) => {
+          const next = { ...prev };
+          users.forEach((u) => {
+            next[u.id] = u.avatarUrl;
+          });
+          return next;
+        });
+        setPresenceMap((prev) => {
+          const next = { ...prev };
+          users.forEach((u) => {
+            next[u.id] = u.presenceStatus;
+          });
+          return next;
+        });
+      } catch (err) {
+        console.warn("[ChatPanel] falha ao carregar perfis:", err);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [messages]);
+
+  // Realtime: escuta mudanças nos profiles dos autores (avatar/presence) pra
+  // refletir ao vivo. Quando alguém troca foto ou status, o outro lado vê.
+  useEffect(() => {
+    const idsUnicos = Array.from(new Set(messages.map((m) => m.autorId)));
+    if (idsUnicos.length === 0) return;
+
+    const channel = supabase
+      .channel(`profiles-${projectId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "profiles",
+        },
+        (payload) => {
+          const novo = payload.new as {
+            id: string;
+            avatar_url: string | null;
+            presence_status: PresenceStatus | null;
+          };
+          if (!idsUnicos.includes(novo.id)) return;
+          setAvatarMap((prev) => ({
+            ...prev,
+            [novo.id]: novo.avatar_url ?? undefined,
+          }));
+          setPresenceMap((prev) => ({
+            ...prev,
+            [novo.id]: novo.presence_status ?? "available",
+          }));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [messages, projectId]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -340,11 +675,36 @@ export function ChatPanel({
     }
   };
 
+  // Toggle de reação — atualiza otimisticamente e o Realtime confirma depois
+  const handleReact = async (messageId: string, emoji: string) => {
+    try {
+      const novasReactions = await toggleMessageReaction(
+        messageId,
+        userId,
+        emoji
+      );
+      setMessages((msgs) =>
+        msgs.map((m) =>
+          m.id === messageId
+            ? {
+                ...m,
+                reactions:
+                  novasReactions.length > 0 ? novasReactions : undefined,
+              }
+            : m
+        )
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Erro ao reagir.";
+      toast.error(msg);
+    }
+  };
+
   return (
     <div className="flex flex-col h-[520px]">
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto pr-2 space-y-3"
+        className="flex-1 overflow-y-auto overflow-x-hidden pr-2 pb-2"
       >
         {carregando ? (
           <div className="text-center py-10 text-sm text-muted-foreground">
@@ -355,9 +715,39 @@ export function ChatPanel({
             {emptyHint ?? "Nenhuma mensagem ainda. Mande a primeira!"}
           </div>
         ) : (
-          messages.map((m) => (
-            <MessageBubble key={m.id} message={m} mineId={userId} />
-          ))
+          messages.map((m, i) => {
+            const anterior = messages[i - 1];
+            const proxima = messages[i + 1];
+            const MAX_GAP_MS = 5 * 60 * 1000;
+            const tsAtual = new Date(m.createdAt).getTime();
+
+            const isPrimeiraDoGrupo =
+              !anterior ||
+              anterior.autorId !== m.autorId ||
+              tsAtual - new Date(anterior.createdAt).getTime() > MAX_GAP_MS;
+
+            const isUltimaDoGrupo =
+              !proxima ||
+              proxima.autorId !== m.autorId ||
+              new Date(proxima.createdAt).getTime() - tsAtual > MAX_GAP_MS;
+
+            return (
+              <MessageBubble
+                key={m.id}
+                message={m}
+                mineId={userId}
+                mineName={userName}
+                mineAvatarUrl={userAvatarUrl}
+                minePresence={userPresence}
+                autorAvatarUrl={avatarMap[m.autorId]}
+                autorPresence={presenceMap[m.autorId]}
+                isPrimeiraDoGrupo={isPrimeiraDoGrupo}
+                isUltimaDoGrupo={isUltimaDoGrupo}
+                onReact={handleReact}
+                onAttachmentOpen={setViewingAttachment}
+              />
+            );
+          })
         )}
       </div>
 
@@ -408,6 +798,38 @@ export function ChatPanel({
         >
           <Paperclip className="w-4 h-4" />
         </Button>
+
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              title="Inserir emoji"
+              className="flex-shrink-0"
+            >
+              <Smile className="w-4 h-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent
+            className="p-0 border-border/60 w-auto"
+            align="end"
+            side="top"
+            sideOffset={8}
+          >
+            <EmojiPicker
+              theme={Theme.DARK}
+              emojiStyle={EmojiStyle.NATIVE}
+              skinTonesDisabled
+              searchPlaceHolder="Buscar emoji..."
+              previewConfig={{ showPreview: false }}
+              onEmojiClick={(data) => setTexto((t) => t + data.emoji)}
+              width={320}
+              height={380}
+            />
+          </PopoverContent>
+        </Popover>
+
         <Input
           value={texto}
           onChange={(e) => setTexto(e.target.value)}
@@ -427,107 +849,21 @@ export function ChatPanel({
           <Send className="w-4 h-4" />
         </Button>
       </div>
+
+      {/* Modal de visualização de anexos (imagem/PDF/outros) */}
+      <AttachmentViewer
+        attachment={viewingAttachment}
+        open={viewingAttachment !== null}
+        onOpenChange={(o) => {
+          if (!o) setViewingAttachment(null);
+        }}
+      />
     </div>
   );
 }
 
-export function BriefingDisplay({ briefing }: { briefing: QuestionnaireData }) {
-  return (
-    <div className="space-y-5">
-      <Section title="Cliente">
-        <Item label="Nome" value={briefing.nome} />
-        <Item label="E-mail" value={briefing.email} />
-        <Item label="Telefone" value={briefing.celular} />
-        {briefing.empresa && <Item label="Empresa" value={briefing.empresa} />}
-        {briefing.cargo && <Item label="Cargo" value={briefing.cargo} />}
-        {briefing.ramo && <Item label="Ramo" value={briefing.ramo} />}
-      </Section>
-
-      <Section title="Projeto">
-        <Item label="Objetivo" value={briefing.objetivoFrase} />
-        {briefing.entregas.length > 0 && (
-          <Item label="Entregas" value={briefing.entregas.join(", ")} />
-        )}
-        {briefing.publicoAlvo && (
-          <Item label="Público-alvo" value={briefing.publicoAlvo} />
-        )}
-      </Section>
-
-      {Object.keys(briefing.detalhesTecnicos).length > 0 && (
-        <Section title="Detalhes técnicos">
-          {Object.entries(briefing.detalhesTecnicos).map(([k, v]) => (
-            <Item
-              key={k}
-              label={k}
-              value={
-                Array.isArray(v)
-                  ? v.join(", ")
-                  : typeof v === "boolean"
-                  ? v
-                    ? "Sim"
-                    : "Não"
-                  : String(v)
-              }
-            />
-          ))}
-        </Section>
-      )}
-
-      <Section title="Identidade & referências">
-        {briefing.temIdentidade && (
-          <Item label="Identidade" value={briefing.temIdentidade} />
-        )}
-        {briefing.temDominio && (
-          <Item label="Domínio" value={briefing.temDominio} />
-        )}
-        {briefing.referencias && (
-          <Item label="Referências" value={briefing.referencias} />
-        )}
-        {briefing.estiloDesejado && (
-          <Item label="Estilo" value={briefing.estiloDesejado} />
-        )}
-      </Section>
-
-      <Section title="Prazo & investimento">
-        {briefing.prazo && <Item label="Prazo" value={briefing.prazo} />}
-        {briefing.orcamento && (
-          <Item label="Orçamento" value={briefing.orcamento} />
-        )}
-        {briefing.comoConheceu && (
-          <Item label="Como conheceu" value={briefing.comoConheceu} />
-        )}
-      </Section>
-    </div>
-  );
-}
-
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <h4 className="text-xs font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
-        {title}
-      </h4>
-      <dl className="space-y-2 text-sm">{children}</dl>
-    </div>
-  );
-}
-
-function Item({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex flex-col sm:flex-row sm:gap-4">
-      <dt className="text-muted-foreground sm:w-36 sm:flex-shrink-0">
-        {label}
-      </dt>
-      <dd className="text-foreground/90 break-words flex-1">{value || "—"}</dd>
-    </div>
-  );
-}
+// Re-export do BriefingDisplay novo (implementação moderna em _briefing-display.tsx)
+export { BriefingDisplayV2 as BriefingDisplay } from "./_briefing-display";
 
 export interface MeetingFormValues {
   data: string;
@@ -535,15 +871,20 @@ export interface MeetingFormValues {
   topico: string;
   notificarEmail: boolean;
   notificarWhatsapp: boolean;
+  participantesExtras: string[];
 }
 
 export function MeetingScheduler({
+  mode = "client",
+  codificaEmail,
   initial,
   onSubmit,
   onCancel,
   submitLabel = "Confirmar agendamento",
   saving = false,
 }: {
+  mode?: "client" | "admin";
+  codificaEmail: string;
   initial?: Partial<MeetingFormValues>;
   onSubmit: (v: MeetingFormValues) => void;
   onCancel?: () => void;
@@ -559,6 +900,38 @@ export function MeetingScheduler({
   const [notificarWhatsapp, setNotificarWhatsapp] = useState(
     initial?.notificarWhatsapp ?? false
   );
+  const [participantesExtras, setParticipantesExtras] = useState<string[]>(
+    initial?.participantesExtras ?? []
+  );
+  const [novoEmail, setNovoEmail] = useState("");
+  const [emailError, setEmailError] = useState<string | null>(null);
+
+  const isValidEmail = (s: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.trim());
+
+  const adicionarEmail = () => {
+    const e = novoEmail.trim().toLowerCase();
+    if (!e) return;
+    if (!isValidEmail(e)) {
+      setEmailError("Email inválido.");
+      return;
+    }
+    if (e === codificaEmail.toLowerCase()) {
+      setEmailError("A Codifica já está incluída.");
+      return;
+    }
+    if (participantesExtras.includes(e)) {
+      setEmailError("Esse email já foi adicionado.");
+      return;
+    }
+    setParticipantesExtras([...participantesExtras, e]);
+    setNovoEmail("");
+    setEmailError(null);
+  };
+
+  const removerEmail = (e: string) => {
+    setParticipantesExtras(participantesExtras.filter((x) => x !== e));
+  };
 
   const { hoje, limite } = useMemo(() => {
     const h = new Date();
@@ -579,7 +952,36 @@ export function MeetingScheduler({
       toast.error("Escolha o horário da reunião.");
       return;
     }
-    onSubmit({ data, horario, topico, notificarEmail, notificarWhatsapp });
+
+    // Se ficou email digitado no campo mas o usuário não clicou em "Adicionar",
+    // tenta incluir agora antes de submeter (evita descartar silenciosamente).
+    let finalExtras = participantesExtras;
+    const pendente = novoEmail.trim().toLowerCase();
+    if (pendente) {
+      if (!isValidEmail(pendente)) {
+        setEmailError("Email inválido. Corrija ou remova antes de continuar.");
+        return;
+      }
+      if (pendente === codificaEmail.toLowerCase()) {
+        setEmailError("A Codifica já está incluída. Remova do campo antes de continuar.");
+        return;
+      }
+      if (!participantesExtras.includes(pendente)) {
+        finalExtras = [...participantesExtras, pendente];
+        setParticipantesExtras(finalExtras);
+      }
+      setNovoEmail("");
+      setEmailError(null);
+    }
+
+    onSubmit({
+      data,
+      horario,
+      topico,
+      notificarEmail,
+      notificarWhatsapp,
+      participantesExtras: finalExtras,
+    });
   };
 
   return (
@@ -646,30 +1048,112 @@ export function MeetingScheduler({
       </div>
 
       <div className="border-t border-border/40 pt-5">
-        <Label className="mb-3 block">Como receber a confirmação?</Label>
-        <div className="space-y-2">
-          <label className="flex items-center gap-3 p-3 rounded-lg border border-border/60 cursor-pointer hover:border-primary/30 transition-colors">
-            <Checkbox
-              checked={notificarEmail}
-              onCheckedChange={(v) => setNotificarEmail(v === true)}
-            />
-            <Mail className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm">
-              Por <strong>e-mail</strong> — com o link do Google Meet.
-            </span>
-          </label>
-          <label className="flex items-center gap-3 p-3 rounded-lg border border-border/60 cursor-pointer hover:border-primary/30 transition-colors">
-            <Checkbox
-              checked={notificarWhatsapp}
-              onCheckedChange={(v) => setNotificarWhatsapp(v === true)}
-            />
-            <MessageCircle className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm">
-              Também por <strong>WhatsApp</strong> — no número cadastrado.
-            </span>
-          </label>
+        <Label className="mb-3 block flex items-center gap-2">
+          <Users className="w-4 h-4 text-muted-foreground" />
+          Participantes da reunião
+        </Label>
+
+        <div className="flex items-center gap-2 p-3 rounded-lg border border-border/60 bg-card/30 mb-2">
+          <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center flex-shrink-0">
+            <span className="text-xs font-bold text-primary">C</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-medium">Codifica</div>
+            <div className="text-xs text-muted-foreground truncate">
+              {codificaEmail}
+            </div>
+          </div>
+          <span className="text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/50 px-2 py-0.5 rounded">
+            Incluída
+          </span>
         </div>
+
+        {participantesExtras.map((email) => (
+          <div
+            key={email}
+            className="flex items-center gap-2 p-3 rounded-lg border border-border/60 bg-card/30 mb-2"
+          >
+            <div className="w-8 h-8 rounded-full bg-accent/15 flex items-center justify-center flex-shrink-0">
+              <Mail className="w-4 h-4 text-accent" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-medium truncate">{email}</div>
+            </div>
+            <button
+              type="button"
+              onClick={() => removerEmail(email)}
+              className="text-muted-foreground hover:text-destructive transition-colors p-1"
+              aria-label={`Remover ${email}`}
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        ))}
+
+        <div className="flex gap-2 mt-3">
+          <Input
+            type="email"
+            placeholder="Adicionar outro participante (email)"
+            value={novoEmail}
+            onChange={(e) => {
+              setNovoEmail(e.target.value);
+              if (emailError) setEmailError(null);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                adicionarEmail();
+              }
+            }}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={adicionarEmail}
+            disabled={!novoEmail.trim()}
+          >
+            <Plus className="w-4 h-4 mr-1" />
+            Adicionar
+          </Button>
+        </div>
+        {emailError && (
+          <p className="text-xs text-destructive mt-2">{emailError}</p>
+        )}
+        <p className="text-xs text-muted-foreground mt-2">
+          Você e a Codifica são incluídos automaticamente. Cada participante
+          recebe o convite com o link do Google Meet por email.
+        </p>
       </div>
+
+      {mode === "admin" && (
+        <div className="border-t border-border/40 pt-5">
+          <Label className="mb-3 block">
+            Controle interno — confirmações (admin)
+          </Label>
+          <div className="space-y-2">
+            <label className="flex items-center gap-3 p-3 rounded-lg border border-border/60 cursor-pointer hover:border-primary/30 transition-colors">
+              <Checkbox
+                checked={notificarEmail}
+                onCheckedChange={(v) => setNotificarEmail(v === true)}
+              />
+              <Mail className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm">
+                Marcar para acompanhar confirmação por <strong>email</strong>.
+              </span>
+            </label>
+            <label className="flex items-center gap-3 p-3 rounded-lg border border-border/60 cursor-pointer hover:border-primary/30 transition-colors">
+              <Checkbox
+                checked={notificarWhatsapp}
+                onCheckedChange={(v) => setNotificarWhatsapp(v === true)}
+              />
+              <MessageCircle className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm">
+                Marcar para acompanhar confirmação por <strong>WhatsApp</strong>.
+              </span>
+            </label>
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-wrap gap-2 pt-2">
         <Button
