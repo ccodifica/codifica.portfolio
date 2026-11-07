@@ -241,6 +241,8 @@ export interface Project {
   briefing: QuestionnaireData;
   notasAdmin?: string;
   documentacoes: DocumentacoesProjeto;
+  /** Sistema entregue que segue com a manutenção da Codifica ("No ar" no painel). */
+  manutencaoAtiva: boolean;
   createdAt: string;
   updatedAt: string;
 }

@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { ROTAS } from "@/config/rotas";
+import { registrar } from "@/lib/metricas";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,15 +16,8 @@ import {
 import { ChevronLeft, ChevronRight, ExternalLink, Filter } from "lucide-react";
 import { FaApple, FaGooglePlay } from "react-icons/fa";
 import { cn } from "@/lib/utils";
-import projectArcanjo from "@/assets/project-arcanjo.png";
-import projectBaile55 from "@/assets/project-baile55.png";
-import projectConsultec from "@/assets/project-consultec.png";
-import projectJardins from "@/assets/project-jardins.png";
-import projectKidstogether from "@/assets/project-kidstogether.png";
-import projectMeiodomato from "@/assets/project-meiodomato.png";
-import projectServitec from "@/assets/project-servitec.png";
-import appKids2gether from "@/assets/app-kids2gether.png";
-import appScaleclock from "@/assets/app-scaleclock.png";
+import { PROJETOS_APP, PROJETOS_WEB } from "@/config/projetos";
+import { registrarCliqueProjeto, useProjetosOrdenados } from "@/lib/ordemProjetos";
 
 const WEB_PER_PAGE = 6;
 const APP_PER_PAGE = 4;
@@ -140,107 +135,19 @@ const Portfolio = () => {
     );
   };
 
-  const filters = ["Todos", "Web", "App"];
+  const filters = ["Todos", "Sites", "Sistemas", "Apps"];
 
-  const projects = [
-    {
-      id: 1,
-      title: "Arcanjo Sociedade de Advogados",
-      description: "Site institucional para escritório especializado em Direito Tributário, Regulatório, Econômico e Financeiro. Identidade sóbria e elegante para transmitir credibilidade e expertise jurídica.",
-      category: "Web",
-      image: projectArcanjo,
-      technologies: ["HTML5", "CSS3", "JavaScript", "Responsivo"],
-      url: "https://www.arcanjoadvogados.com.br/",
-      color: "from-slate-700 to-amber-700",
-    },
-    {
-      id: 7,
-      title: "Servitec Dinamômetro",
-      description: "Site institucional para fabricante referência em dinamômetros automotivos desde 1988, com catálogo de produtos, blog técnico, suporte e seleção de idiomas.",
-      category: "Web",
-      image: projectServitec,
-      technologies: ["JavaScript", "CSS3", "WebP", "Multilíngue"],
-      url: "https://www.servitecdinamometro.com.br/",
-      color: "from-zinc-800 to-amber-500",
-    },
-    {
-      id: 3,
-      title: "Consultec Soluções",
-      description: "Landing page para empresa de serviços topográficos e agronômicos, destacando 14 anos transformando propriedades rurais em segurança jurídica e crédito.",
-      category: "Web",
-      image: projectConsultec,
-      technologies: ["React", "Tailwind CSS", "SEO", "Formulários"],
-      url: "https://www.consultecsolucoes.com/",
-      color: "from-green-600 to-emerald-700",
-    },
-    {
-      id: 4,
-      title: "Jardins Dona Isabel",
-      description: "Landing page premium para empreendimento de luxo sustentável na Serra Gaúcha, com tipografia editorial, animações e experiência visual imersiva voltada ao público de alto padrão.",
-      category: "Web",
-      image: projectJardins,
-      technologies: ["JavaScript", "CSS Animations", "WhatsApp API", "ESG"],
-      url: "https://www.jardinsdonaisabel.com.br/",
-      color: "from-stone-700 to-emerald-800",
-    },
-    {
-      id: 5,
-      title: "Kids2gether",
-      description: "Portal de turismo familiar com destinos, dicas para viajar com crianças, eco-turismo e agência integrada — complementado por aplicativo mobile próprio.",
-      category: "Web",
-      image: projectKidstogether,
-      technologies: ["React", "Node.js", "API REST", "App Mobile"],
-      url: "https://www.kids2gether.com.br/",
-      color: "from-teal-400 to-yellow-500",
-    },
-    {
-      id: 6,
-      title: "Meio do Mato Eventos",
-      description: "Landing page para espaço de eventos rústico-chique na Ilha de Guaratiba (RJ), com galeria, depoimentos e formulário de orçamento integrado ao WhatsApp.",
-      category: "Web",
-      image: projectMeiodomato,
-      technologies: ["Vite", "React", "Tailwind CSS", "WhatsApp API"],
-      url: "https://lp.meiodomato.com.br/",
-      color: "from-emerald-600 to-green-800",
-    },
-    {
-      id: 2,
-      title: "Baile 55",
-      description: "Plataforma de ensino musical com cursos online de teoria e improvisação, integrada ao app ScaleClock para estudo de escalas. Suporte multilíngue e foco em conversão.",
-      category: "Web",
-      image: projectBaile55,
-      technologies: ["WordPress", "Elementor", "JavaScript", "Multilíngue"],
-      url: "https://baile55.com/",
-      color: "from-pink-500 to-purple-600",
-    },
-    {
-      id: 8,
-      title: "Kids2gether",
-      description: "Aplicativo mobile para famílias que viajam com crianças — destinos, dicas, novidades e roteiros familiares na palma da mão.",
-      category: "App",
-      image: appKids2gether,
-      technologies: ["React Native", "iOS", "Android"],
-      appStoreUrl: "https://apps.apple.com/br/app/kids2gether/id1554942484",
-      playStoreUrl: "https://play.google.com/store/apps/details?id=com.kids2gether&hl=pt_BR",
-      titleColor: "text-violet-400",
-    },
-    {
-      id: 9,
-      title: "Scaleclock",
-      description: "App nº 1 em escalas musicais — visualização interativa de escalas, modos e tonalidades para músicos e estudantes de música.",
-      category: "App",
-      image: appScaleclock,
-      technologies: ["React Native", "iOS", "Android"],
-      appStoreUrl: "https://apps.apple.com/br/app/scaleclock/id1464221197",
-      playStoreUrl: "https://play.google.com/store/apps/details?id=com.scaleclock&hl=pt_BR&gl=US",
-      titleColor: "text-white",
-    },
-  ];
-
-  const webProjects = projects.filter((p) => p.category === "Web");
-  const appProjects = projects.filter((p) => p.category === "App");
-  const showWeb = selectedFilter === "Todos" || selectedFilter === "Web";
-  const showApps = selectedFilter === "Todos" || selectedFilter === "App";
+  const webOrdenados = useProjetosOrdenados(PROJETOS_WEB);
+  const appOrdenados = useProjetosOrdenados(PROJETOS_APP);
+  const webProjects = webOrdenados.filter(
+    (p) =>
+      selectedFilter === "Todos" ||
+      (selectedFilter === "Sites" && p.categoria === "Site") ||
+      (selectedFilter === "Sistemas" && p.categoria === "Sistema")
+  );
+  const appProjects = appOrdenados;
+  const showWeb = selectedFilter !== "Apps";
+  const showApps = selectedFilter === "Todos" || selectedFilter === "Apps";
 
   const webTotalPages = Math.max(1, Math.ceil(webProjects.length / WEB_PER_PAGE));
   const appTotalPages = Math.max(1, Math.ceil(appProjects.length / APP_PER_PAGE));
@@ -256,7 +163,7 @@ const Portfolio = () => {
   return (
     <div className="min-h-screen">
       <Header />
-      
+      <main>
       {/* Hero Section */}
       <section className="pt-24 pb-16 bg-gradient-hero">
         <div className="container mx-auto px-4 text-center">
@@ -265,7 +172,7 @@ const Portfolio = () => {
               Projetos
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto text-balance">
-              Confira alguns projetos desenvolvidos pela Codifica que mostram nossa capacidade de transformar ideias em software.
+              Sites, sistemas e aplicativos que já estão no ar, usados por clientes de verdade.
             </p>
           </div>
         </div>
@@ -303,10 +210,10 @@ const Portfolio = () => {
             {showWeb && (
               <div className="mb-20 scroll-mt-24" ref={webSectionRef}>
                 <h2 className="text-2xl md:text-3xl font-bold mb-2 text-center text-foreground">
-                  Sites e Landing Pages
+                  {selectedFilter === "Sites" ? "Sites" : selectedFilter === "Sistemas" ? "Sistemas" : "Sites e sistemas"}
                 </h2>
                 <p className="text-muted-foreground text-center mb-10 max-w-2xl mx-auto">
-                  Presença digital sob medida para clientes de diversos segmentos.
+                  Sites, plataformas de inscrição, ticketeria e gestão para clientes de vários segmentos.
                 </p>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {paginatedWebProjects.map((project, index) => (
@@ -317,27 +224,35 @@ const Portfolio = () => {
                     >
                       <div className="relative overflow-hidden">
                         <img
-                          src={project.image}
-                          alt={project.title}
-                          className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                          src={project.imagem}
+                          alt={project.titulo}
+                          loading="lazy"
+                          className="w-full h-48 object-cover object-top group-hover:scale-110 transition-transform duration-500"
                         />
                         <div className="absolute top-4 right-4">
                           <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm">
-                            {project.category}
+                            {project.categoria}
                           </Badge>
                         </div>
+                        {project.parceria === "4tuna" && (
+                          <div className="absolute bottom-3 left-3">
+                            <Badge variant="secondary" className="bg-background/85 backdrop-blur-sm text-[11px] font-medium">
+                              Em parceria com a 4tuna
+                            </Badge>
+                          </div>
+                        )}
                       </div>
 
                       <CardContent className="p-6 flex flex-col flex-1">
                         <h3 className="text-xl font-semibold mb-3 text-foreground group-hover:text-primary transition-colors duration-300">
-                          {project.title}
+                          {project.titulo}
                         </h3>
                         <p className="text-muted-foreground mb-4 text-sm leading-relaxed">
-                          {project.description}
+                          {project.descricao}
                         </p>
 
                         <div className="flex flex-wrap gap-2 mb-6">
-                          {project.technologies.map((tech) => (
+                          {project.tags.map((tech) => (
                             <Badge key={tech} variant="outline" className="text-xs">
                               {tech}
                             </Badge>
@@ -350,7 +265,8 @@ const Portfolio = () => {
                               href={project.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              aria-label={`Abrir site ${project.title} em nova aba`}
+                              aria-label={`Abrir ${project.titulo} em nova aba`}
+                              onClick={() => registrarCliqueProjeto(project.id)}
                             >
                               <ExternalLink className="w-4 h-4 mr-2" />
                               Ver Projeto
@@ -386,21 +302,22 @@ const Portfolio = () => {
                         <div className="relative w-52 aspect-[9/19] bg-black rounded-[2.75rem] p-[6px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.9)] ring-1 ring-white/10 mb-7 group-hover:scale-[1.03] transition-transform duration-500">
                           <div className="absolute top-2 left-1/2 -translate-x-1/2 w-20 h-4 bg-black rounded-full z-10" />
                           <img
-                            src={project.image}
-                            alt={project.title}
+                            src={project.imagem}
+                            alt={project.titulo}
+                            loading="lazy"
                             className="w-full h-full object-cover rounded-[2.4rem]"
                           />
                         </div>
 
-                        <h3 className={`text-2xl font-bold mb-3 ${project.titleColor || "text-white"}`}>
-                          {project.title}
+                        <h3 className={`text-2xl font-bold mb-3 ${project.corTitulo || "text-white"}`}>
+                          {project.titulo}
                         </h3>
                         <p className="text-gray-400 mb-6 text-sm leading-relaxed max-w-xs">
-                          {project.description}
+                          {project.descricao}
                         </p>
 
                         <div className="flex flex-wrap gap-2 mb-7 justify-center">
-                          {project.technologies.map((tech) => (
+                          {project.tags.map((tech) => (
                             <Badge
                               key={tech}
                               variant="outline"
@@ -420,7 +337,8 @@ const Portfolio = () => {
                               href={project.appStoreUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              aria-label={`Baixar ${project.title} na App Store`}
+                              aria-label={`Baixar ${project.titulo} na App Store`}
+                              onClick={() => registrarCliqueProjeto(project.id)}
                             >
                               <FaApple className="w-5 h-5 mr-2" />
                               App Store
@@ -434,7 +352,8 @@ const Portfolio = () => {
                               href={project.playStoreUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              aria-label={`Baixar ${project.title} no Google Play`}
+                              aria-label={`Baixar ${project.titulo} no Google Play`}
+                              onClick={() => registrarCliqueProjeto(project.id)}
                             >
                               <FaGooglePlay className="w-5 h-5 mr-2" />
                               Google Play
@@ -456,18 +375,27 @@ const Portfolio = () => {
               Gostou do que viu?
             </h3>
             <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-              Vamos conversar sobre como podemos transformar sua ideia em realidade com soluções sob medida.
+              O seu negócio pode ser o próximo. Você vê uma prévia do seu site antes de pagar qualquer coisa.
             </p>
-            <Button 
-              onClick={handleContactClick}
+            <Button
+              asChild
               className="bg-gradient-primary hover:bg-gradient-secondary text-primary-foreground font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
             >
-              Faça seu orçamento
+              <Link to={ROTAS.produto} onClick={() => registrar("clique_comecar", "quero_meu_site_projetos")}>
+                Quero meu site
+              </Link>
             </Button>
+            <p className="text-sm text-muted-foreground mt-4">
+              Precisa de um sistema?{" "}
+              <button onClick={handleContactClick} className="text-primary hover:underline">
+                Fale com a gente
+              </button>
+            </p>
           </div>
         </div>
       </section>
 
+      </main>
       <Footer />
     </div>
   );

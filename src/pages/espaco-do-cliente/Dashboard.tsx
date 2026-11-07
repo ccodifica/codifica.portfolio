@@ -121,7 +121,7 @@ const Dashboard = () => {
 
   const handleLogout = async () => {
     await logout();
-    navigate("/espaco-do-cliente", { replace: true });
+    navigate("/", { replace: true });
   };
 
   const selecionado = projects.find((p) => p.id === selectedId);
@@ -145,15 +145,6 @@ const Dashboard = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Link to="/espaco-do-cliente/questionario">
-                  <Button
-                    variant="outline"
-                    className="border-primary/40 text-foreground hover:bg-primary/10 hover:text-primary"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Novo projeto
-                  </Button>
-                </Link>
                 <Button
                   variant="ghost"
                   onClick={handleLogout}
@@ -205,13 +196,13 @@ const EmptyState = () => (
     </div>
     <h2 className="text-xl font-bold mb-2">Você ainda não tem projetos</h2>
     <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-      Comece preenchendo o briefing para que possamos analisar e te apresentar
-      uma proposta personalizada.
+      Os projetos de sistema aparecem aqui depois da nossa conversa. Se quer um
+      site, comece pela prévia grátis.
     </p>
-    <Link to="/espaco-do-cliente/questionario">
+    <Link to="/comecar">
       <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
         <Plus className="w-4 h-4 mr-2" />
-        Iniciar briefing
+        Quero minha prévia grátis
       </Button>
     </Link>
   </div>

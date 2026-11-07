@@ -24,8 +24,10 @@ const Privacidade = () => {
         <p>Adotamos medidas técnicas e organizacionais para proteger os dados contra acesso não autorizado.</p>
         <h2>5. Direitos do Titular</h2>
         <p>Você pode solicitar atualização ou exclusão dos seus dados entrando em contato por e-mail.</p>
-        <h2>6. Cookies</h2>
-        <p>Podemos utilizar cookies essenciais e analíticos. Você pode desativá-los no navegador, porém certas funcionalidades podem ser afetadas.</p>
+        <h2>6. Métricas e cookies</h2>
+        <p>Contamos de forma anônima quais páginas e etapas do site são usadas (por exemplo, quantas pessoas abriram o formulário e quantas enviaram), para melhorar o site. Essa contagem não usa cookies nem guarda nome, telefone ou e-mail: usa só um código aleatório que some quando a aba do navegador é fechada, além da campanha de origem do link e do tipo de aparelho.</p>
+        <p>Com a sua permissão, usamos também o Microsoft Clarity, que registra cliques e rolagem para entendermos onde o site confunde as pessoas. O conteúdo digitado nos campos não é gravado. Você pode recusar no aviso que aparece no site, sem perder nenhuma funcionalidade.</p>
+        <p>Nos pedidos de site, guardamos os dados informados no formulário, o histórico das etapas do pedido e, no aceite do contrato, nome, CPF ou CNPJ, data, hora e navegador usados, para comprovar o aceite.</p>
         <h2>7. Retenção</h2>
         <p>Os dados são mantidos somente pelo tempo necessário para cumprir a finalidade original ou exigências legais.</p>
         <h2>8. Alterações</h2>

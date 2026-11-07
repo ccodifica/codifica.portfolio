@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Code, UserCircle2 } from "lucide-react";
+import { Menu, X, Code } from "lucide-react";
+import { MenuContaDesktop, MenuContaMobile } from "@/components/MenuConta";
+import { registrar } from "@/lib/metricas";
+import { ROTAS } from "@/config/rotas";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,6 +14,15 @@ const Header = () => {
 
   // Force header background on Sobre page
   const shouldShowBackground = isScrolled || location.pathname === '/sobre';
+
+  // Botão principal: "Quero meu site" leva ao produto. Quem já está nas páginas
+  // do produto vai direto ao formulário; no próprio formulário o botão some.
+  const PAGINAS_PRODUTO = [ROTAS.produto, "/como-funciona", "/contrato"];
+  const naPaginaDoProduto = PAGINAS_PRODUTO.includes(location.pathname);
+  const noFormulario = location.pathname === ROTAS.comecar || location.pathname.startsWith("/pedido/");
+  const cta = naPaginaDoProduto
+    ? { to: ROTAS.comecar, rotulo: "Quero minha prévia", origem: "topo_produto" }
+    : { to: ROTAS.produto, rotulo: "Quero meu site", origem: "quero_meu_site_topo" };
 
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -48,6 +60,7 @@ const Header = () => {
 
   const navItems = [
     { name: "Início", path: "/" },
+    { name: "Site + Google", path: "/presenca-no-google" },
     { name: "Projetos", path: "/portfolio" },
     { name: "Sobre", path: "/sobre" },
   ];
@@ -94,21 +107,23 @@ const Header = () => {
                 {item.name}
               </Link>
             ))}
-            <Link to="/espaco-do-cliente" onClick={() => setIsMenuOpen(false)}>
-              <Button
-                variant="outline"
-                className="font-semibold px-5 py-2 rounded-lg border-primary/40 text-foreground hover:bg-primary/10 hover:text-primary transition-all duration-300"
-              >
-                <UserCircle2 className="w-4 h-4 mr-2" />
-                Espaço do Cliente
-              </Button>
-            </Link>
-            <Button
+            <button
               onClick={handleContactClick}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 py-2 rounded-lg transition-all duration-300"
+              className="link-underline font-medium transition-colors duration-300 text-muted-foreground hover:text-foreground"
             >
-              Fale Conosco
-            </Button>
+              Contato
+            </button>
+            <MenuContaDesktop />
+            {!noFormulario && (
+              <Button
+                asChild
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 py-2 rounded-lg transition-all duration-300"
+              >
+                <Link to={cta.to} onClick={() => registrar("clique_comecar", cta.origem)}>
+                  {cta.rotulo}
+                </Link>
+              </Button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -148,21 +163,29 @@ const Header = () => {
                   {item.name}
                 </Link>
               ))}
-              <Link to="/espaco-do-cliente" onClick={() => setIsMenuOpen(false)}>
+              <MenuContaMobile aoNavegar={() => setIsMenuOpen(false)} />
+              {!noFormulario && (
                 <Button
-                  variant="outline"
-                  className="font-semibold px-5 py-2 rounded-lg border-primary/40 text-foreground hover:bg-primary/10 hover:text-primary transition-all duration-300 w-full mt-2"
+                  asChild
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 py-2 rounded-lg transition-all duration-300 w-full"
                 >
-                  <UserCircle2 className="w-4 h-4 mr-2" />
-                  Espaço do Cliente
+                  <Link
+                    to={cta.to}
+                    onClick={() => {
+                      registrar("clique_comecar", `${cta.origem}_celular`);
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    {cta.rotulo}
+                  </Link>
                 </Button>
-              </Link>
-              <Button
+              )}
+              <button
                 onClick={handleContactClick}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 py-2 rounded-lg transition-all duration-300 w-full"
+                className="text-sm text-muted-foreground hover:text-foreground py-1"
               >
-                Fale Conosco
-              </Button>
+                Dúvidas ou sistema? Fale conosco
+              </button>
             </div>
           </div>
         )}

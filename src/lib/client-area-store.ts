@@ -102,6 +102,7 @@ interface ProjectRow {
   briefing: QuestionnaireData;
   notas_admin: string | null;
   documentacoes: DocumentacoesProjetoRow | null;
+  manutencao_ativa?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -250,6 +251,7 @@ function rowToProject(r: ProjectRow): Project {
     briefing: r.briefing,
     notasAdmin: r.notas_admin ?? undefined,
     documentacoes: rowToDocumentacoes(r.documentacoes),
+    manutencaoAtiva: Boolean(r.manutencao_ativa),
     createdAt: r.created_at,
     updatedAt: r.updated_at,
   };
@@ -439,7 +441,7 @@ export async function updateProject(
   patch: Partial<
     Pick<
       Project,
-      "status" | "progresso" | "nome" | "notasAdmin" | "documentacoes"
+      "status" | "progresso" | "nome" | "notasAdmin" | "documentacoes" | "manutencaoAtiva"
     >
   >
 ): Promise<Project | undefined> {
@@ -448,6 +450,7 @@ export async function updateProject(
   if (patch.progresso !== undefined) dbPatch.progresso = patch.progresso;
   if (patch.nome !== undefined) dbPatch.nome = patch.nome;
   if (patch.notasAdmin !== undefined) dbPatch.notas_admin = patch.notasAdmin;
+  if (patch.manutencaoAtiva !== undefined) dbPatch.manutencao_ativa = patch.manutencaoAtiva;
   if (patch.documentacoes !== undefined) {
     dbPatch.documentacoes = documentacoesToRow(patch.documentacoes);
   }
