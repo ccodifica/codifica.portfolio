@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, Loader2, Mail } from "lucide-react";
+import { ArrowLeft, ArrowRight, LayoutDashboard, Loader2, Mail, User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,10 +23,11 @@ const Entrar = () => {
   const [erro, setErro] = useState("");
   const [reenviarEm, setReenviarEm] = useState(0);
 
-  // Já logado: vai direto para o lugar certo
+  // Já logado: cliente vai direto; admin escolhe se entra no painel ou como cliente (para testar)
   useEffect(() => {
     if (isLoading || !user) return;
-    navigate(destino || (user.role === "admin" ? ROTAS.admin : ROTAS.minhaArea), { replace: true });
+    if (destino) navigate(destino, { replace: true });
+    else if (user.role !== "admin") navigate(ROTAS.minhaArea, { replace: true });
   }, [user, isLoading, navigate, destino]);
 
   useEffect(() => {
@@ -61,7 +62,9 @@ const Entrar = () => {
     setEnviando(true);
     try {
       const u = await entrarComCodigo(email, valor);
-      navigate(destino || (u.role === "admin" ? ROTAS.admin : ROTAS.minhaArea), { replace: true });
+      if (destino) navigate(destino, { replace: true });
+      else if (u.role !== "admin") navigate(ROTAS.minhaArea, { replace: true });
+      // admin: o useEffect não redireciona e a tela mostra a escolha
     } catch (err) {
       setErro((err as Error).message);
       setCodigo("");
@@ -78,6 +81,33 @@ const Entrar = () => {
           Entre com o e-mail que você usou no pedido. Sem senha: mandamos um código.
         </p>
 
+        {user?.role === "admin" && !destino ? (
+          <Cartao>
+            <h2 className="text-xl font-semibold mb-1">Como você quer entrar?</h2>
+            <p className="text-muted-foreground mb-6">{user.email} é da equipe Codifica.</p>
+            <div className="space-y-3">
+              <Button asChild size="lg" className="w-full rounded-xl font-semibold justify-between">
+                <Link to={ROTAS.admin} replace>
+                  <span className="inline-flex items-center">
+                    <LayoutDashboard className="w-4 h-4 mr-2" /> Painel da Codifica
+                  </span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="w-full rounded-xl font-semibold justify-between">
+                <Link to={ROTAS.minhaArea} replace>
+                  <span className="inline-flex items-center">
+                    <UserIcon className="w-4 h-4 mr-2" /> Área do cliente (ver como cliente)
+                  </span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground mt-4">
+              Na área do cliente aparecem os pedidos feitos com este e-mail. Dá para trocar depois pelo menu da sua conta.
+            </p>
+          </Cartao>
+        ) : (
         <Cartao>
           {etapa === "email" ? (
             <form onSubmit={pedirCodigo} className="space-y-4" noValidate>
@@ -162,6 +192,7 @@ const Entrar = () => {
             </p>
           )}
         </Cartao>
+        )}
 
         <div className="mt-8 space-y-3 text-sm text-muted-foreground">
           <p>

@@ -30,13 +30,20 @@ const MinhaArea = () => {
       .catch((e) => setErro((e as Error).message));
   }, [user]);
 
-  if (user?.role === "admin") return <Navigate to={ROTAS.admin} replace />;
   if (pedidos && pedidos.length === 1 && !temProjeto) return <Navigate to={`/pedido/${pedidos[0].codigo}`} replace />;
   if (pedidos && pedidos.length === 0 && temProjeto) return <Navigate to={ROTAS.painelSistema} replace />;
 
   return (
     <PaginaOferta>
       <Secao className="max-w-3xl pt-6">
+        {user?.role === "admin" && (
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-accent/40 bg-accent/10 px-4 py-3 text-sm">
+            <span>Você está vendo a área como cliente.</span>
+            <Link to={ROTAS.admin} className="font-semibold text-primary hover:underline">
+              Ir para o painel →
+            </Link>
+          </div>
+        )}
         <div className="flex items-start justify-between gap-4 mb-6">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold mb-1">Olá{user ? `, ${user.nome.split(" ")[0]}` : ""}!</h1>

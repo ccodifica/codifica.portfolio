@@ -36,7 +36,10 @@ export const Avatar = ({ nome, url, tamanho = 32 }: { nome: string; url?: string
 /** Links do usuário logado (ou o botão "Área do cliente" para quem não entrou). */
 const linksDoUsuario = (admin: boolean) =>
   admin
-    ? [{ to: ROTAS.admin, rotulo: "Painel", icone: LayoutDashboard }]
+    ? [
+        { to: ROTAS.admin, rotulo: "Painel", icone: LayoutDashboard },
+        { to: ROTAS.minhaArea, rotulo: "Ver como cliente", icone: UserIcon },
+      ]
     : [{ to: ROTAS.minhaArea, rotulo: "Minha área", icone: UserIcon }];
 
 /** Versão para o topo no computador: avatar + "Olá, Pedro" com menu. */
