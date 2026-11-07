@@ -2,11 +2,11 @@ import { BLACK_FRIDAY, CARTAO, CONTRATADA, OFERTA, RODADAS, brl } from "./oferta
 
 /**
  * Contrato da oferta "Presença no Google".
- * RASCUNHO: precisa de revisão de advogado antes do primeiro cliente pagante.
+ * Versão final publicada em 07/11/2026 (revisão de advogado ainda recomendada).
  * Toda alteração de texto deve subir a versão: o aceite grava a versão aceita.
  */
-export const CONTRATO_VERSAO = "1.3-rascunho";
-export const CONTRATO_RASCUNHO = true;
+export const CONTRATO_VERSAO = "1.3";
+export const CONTRATO_RASCUNHO = false;
 export const CONTRATO_DATA = "07/11/2026";
 
 export interface Clausula {
