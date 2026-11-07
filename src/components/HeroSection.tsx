@@ -1,214 +1,77 @@
-import { useEffect, useState, useMemo } from "react";
-import projectArcanjo from "@/assets/project-arcanjo.png";
-import projectBaile55 from "@/assets/project-baile55.png";
-import projectConsultec from "@/assets/project-consultec.png";
-import projectJardins from "@/assets/project-jardins.png";
-import projectKidstogether from "@/assets/project-kidstogether.png";
-import projectMeiodomato from "@/assets/project-meiodomato.png";
-import projectServitec from "@/assets/project-servitec.png";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+import { PROJETOS_WEB } from "@/config/projetos";
+import { ROTAS } from "@/config/rotas";
+import { OFERTA, brl, precoAtual } from "@/config/oferta";
+import { registrarCliqueProjeto, useProjetosOrdenados } from "@/lib/ordemProjetos";
+import { registrar } from "@/lib/metricas";
+import { Button } from "@/components/ui/button";
+import { SeloBlackFriday } from "@/components/oferta/Base";
 
-const TypewriterText = () => {
-  const words = useMemo(() => [
-    "startups",
-    "empreendedores",
-    "equipes de produto",
-    "equipes de marketing",
-  ], []);
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const [currentText, setCurrentText] = useState("");
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [showCursor, setShowCursor] = useState(true);
-
-  useEffect(() => {
-    const currentWord = words[currentWordIndex];
-
-    const typewriterTimeout = setTimeout(
-      () => {
-        if (isDeleting) {
-          if (currentText.length > 0) {
-            setCurrentText((prev) => prev.slice(0, -1));
-          } else {
-            setIsDeleting(false);
-            setCurrentWordIndex((prev) => (prev + 1) % words.length);
-          }
-        } else {
-          if (currentText.length < currentWord.length) {
-            setCurrentText((prev) => currentWord.slice(0, prev.length + 1));
-          } else {
-            // Pausa antes de começar a deletar
-            setTimeout(() => setIsDeleting(true), 1500);
-          }
-        }
-      },
-      isDeleting ? 75 : 120
-    ); // Velocidade de deletar vs escrever
-
-    return () => clearTimeout(typewriterTimeout);
-  }, [currentText, isDeleting, currentWordIndex, words]);
-
-  useEffect(() => {
-    const cursorInterval = setInterval(() => {
-      setShowCursor((prev) => !prev);
-    }, 530);
-
-    return () => clearInterval(cursorInterval);
-  }, []);
-
-  const containerStyle = {
-    display: "flex",
-    flexDirection: "row" as const,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "0.25rem",
-    fontFamily: "'Playfair Display', 'Cormorant Garamond', 'Georgia', serif",
-    fontSize: "clamp(1rem, 4vw, 1.6rem)",
-    fontStyle: "italic",
-    fontWeight: "300",
-    letterSpacing: "0.01em",
-    lineHeight: "1.2",
-    WebkitFontSmoothing: "antialiased" as const,
-    MozOsxFontSmoothing: "grayscale" as const,
-    flexWrap: "wrap" as const,
-  };
-
-  const perfectForStyle = {
-    fontFamily: "'Playfair Display', 'Cormorant Garamond', 'Georgia', serif",
-    fontSize: "clamp(1rem, 4vw, 1.6rem)",
-    fontStyle: "italic",
-    fontWeight: "300",
-    letterSpacing: "0.01em",
-    color: "hsl(215, 20.2%, 65.1%)",
-    opacity: "0.8",
-    WebkitFontSmoothing: "antialiased" as const,
-    MozOsxFontSmoothing: "grayscale" as const,
-  };
-
-  const textStyle = {
-    fontFamily: "'Playfair Display', 'Cormorant Garamond', 'Georgia', serif",
-    fontSize: "clamp(1rem, 4vw, 1.6rem)",
-    fontStyle: "italic",
-    fontWeight: "300",
-    letterSpacing: "0.01em",
-    color: "hsl(262, 100%, 58%)",
-    whiteSpace: "nowrap" as const,
-    WebkitFontSmoothing: "antialiased" as const,
-    MozOsxFontSmoothing: "grayscale" as const,
-  };
-
-  const cursorStyle = {
-    fontFamily: "'Playfair Display', 'Cormorant Garamond', 'Georgia', serif",
-    fontSize: "clamp(1rem, 4vw, 1.6rem)",
-    fontStyle: "italic",
-    fontWeight: "300",
-    letterSpacing: "0.01em",
-    color: "hsl(215, 20.2%, 65.1%)",
-    marginLeft: "2px",
-    opacity: showCursor ? 1 : 0,
-    transition: "opacity 0.1s ease-in-out",
-    WebkitFontSmoothing: "antialiased" as const,
-    MozOsxFontSmoothing: "grayscale" as const,
-  };
-
-  return (
-    <div style={containerStyle}>
-      <span style={perfectForStyle}>Perfeito para</span>
-      <div
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          marginLeft: "clamp(0.2em, 2vw, 0.3em)",
-          minWidth: "0", // Permite que o texto se ajuste
-        }}
-      >
-        <span style={textStyle}>{currentText}</span>
-        <span style={cursorStyle}>|</span>
-      </div>
-    </div>
-  );
-};
-
+/**
+ * Topo da home. Fala com o dono de negócio local (o público do produto
+ * Site + Perfil do Google) e deixa os sistemas para a seção seguinte.
+ */
 const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
-
-  const handleContactClick = () => {
-    const contact = document.getElementById("contact");
-    if (contact) {
-      contact.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-  };
+  const projetosOrdenados = useProjetosOrdenados(PROJETOS_WEB);
+  const P = precoAtual();
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100);
     return () => clearTimeout(timer);
   }, []);
 
+  const irParaSistemas = () => document.getElementById("services")?.scrollIntoView({ behavior: "smooth", block: "start" });
+
   return (
-    <section className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-gradient-hero w-full pt-28 sm:pt-32">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,_hsl(262_100%_58%_/_0.1),_transparent_50%)] animate-pulse" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,_hsl(195_100%_50%_/_0.1),_transparent_50%)] animate-pulse" />
+    <section className="relative flex flex-col justify-center overflow-hidden bg-gradient-hero w-full pt-32 sm:pt-36 pb-16">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,_hsl(262_100%_58%_/_0.1),_transparent_50%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,_hsl(195_100%_50%_/_0.1),_transparent_50%)]" />
 
-      {/* Floating Elements */}
-      <div className="absolute top-20 left-10 w-20 h-20 bg-primary/10 rounded-full blur-xl float" />
-      <div
-        className="absolute bottom-20 right-10 w-32 h-32 bg-accent/10 rounded-full blur-xl float"
-        style={{ animationDelay: "2s" }}
-      />
-      <div
-        className="absolute top-1/2 right-20 w-16 h-16 bg-success/10 rounded-full blur-xl float"
-        style={{ animationDelay: "4s" }}
-      />
-
-      {/* Content Wrapper (centered, constrained width for text) */}
       <div className="w-full text-center relative z-10 px-4 sm:px-8">
-        <div
-          className={`mx-auto max-w-5xl transition-all duration-1000 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
-        >
-          {/* Main Heading */}
-          <h1 className="text-reveal hero-text text-3xl md:text-5xl lg:text-6xl font-manrope font-bold mb-6 text-center text-balance leading-tight max-w-4xl mx-auto">
-            Soluções inteligentes
-            <br />
-            em software para o
-            <br />
-            futuro
+        <div className={`mx-auto max-w-5xl transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+          {P.promo && (
+            <Link
+              to={ROTAS.produto}
+              onClick={() => registrar("clique_comecar", "quero_meu_site_home_bf")}
+              className="inline-flex items-center gap-2 rounded-full border border-amber-400/50 bg-amber-400/10 pl-1.5 pr-4 py-1.5 text-sm mb-6 hover:border-amber-400 transition-colors"
+            >
+              <SeloBlackFriday />
+              <span className="text-foreground">
+                Site + Perfil do Google por <strong>{brl(P.pix)}</strong> no Pix até {P.ate}
+              </span>
+            </Link>
+          )}
+
+          <h1 className="hero-text text-4xl md:text-5xl lg:text-6xl font-manrope font-bold mb-6 text-balance leading-tight max-w-4xl mx-auto">
+            Seu negócio encontrado no Google e chamado no WhatsApp
           </h1>
 
-          {/* Subtitle */}
-          <p className="text-reveal font-manrope text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto text-balance leading-relaxed font-medium">
-            Na Codifica, desenvolvemos sistemas e aplicações sob medida para
-            transformar ideias em resultados.
+          <p className="font-manrope text-lg md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto text-balance leading-relaxed">
+            Fazemos o site do seu negócio, completamos o seu Perfil do Google e cuidamos dos dois todo mês. Você vê uma
+            prévia antes de pagar qualquer coisa.
           </p>
 
-          {/* CTA Buttons */}
-          <div className="text-reveal flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button 
-              onClick={handleContactClick}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground font-manrope font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 group"
-            >
-              Fale Conosco!
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+            <Button asChild size="lg" className="rounded-xl font-semibold px-8 shadow-lg group">
+              <Link to={ROTAS.produto} onClick={() => registrar("clique_comecar", "quero_meu_site_home")}>
+                Quero meu site
+                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" aria-hidden />
+              </Link>
             </Button>
-            <Link to="/portfolio">
-              <Button
-                variant="outline"
-                className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-manrope font-medium px-6 py-3 rounded-lg transition-all duration-300"
-              >
-                Ver Projetos
-              </Button>
-            </Link>
+            <Button variant="ghost" size="lg" className="rounded-xl text-muted-foreground hover:text-foreground" onClick={irParaSistemas}>
+              Preciso de um sistema
+            </Button>
           </div>
+          <p className="text-sm text-muted-foreground mt-4">
+            Prévia grátis em até {OFERTA.prazoPreviaHoras} horas úteis. Você só paga se aprovar.
+          </p>
 
-          {/* Portfolio Carousel */}
-          {/* Full Width Portfolio Carousel */}
-          <div className="text-reveal mt-20 pt-16 border-t border-border/50">
+          {/* Projetos no ar */}
+          <div className="mt-16 pt-10 border-t border-border/50">
+            <p className="text-sm uppercase tracking-wide text-muted-foreground mb-6">Alguns projetos nossos no ar</p>
             <div className="relative w-screen left-1/2 -translate-x-1/2 overflow-hidden">
               <div className="absolute inset-0 pointer-events-none z-10">
                 <div className="absolute left-0 top-0 w-20 h-full bg-gradient-to-r from-background to-transparent"></div>
@@ -216,20 +79,10 @@ const HeroSection = () => {
               </div>
               <div className="infinite-scroll-container">
                 <div className="infinite-scroll-track">
-                  {/* Criando múltiplas cópias para garantir loop seamless */}
                   {(() => {
-                    const baseImages = [
-                      { src: projectArcanjo, alt: "Arcanjo Sociedade de Advogados", url: "https://www.arcanjoadvogados.com.br/" },
-                      { src: projectBaile55, alt: "Baile 55", url: "https://baile55.com/" },
-                      { src: projectConsultec, alt: "Consultec", url: "https://www.consultecsolucoes.com/" },
-                      { src: projectJardins, alt: "Jardins Dona Isabel", url: "https://www.jardinsdonaisabel.com.br/" },
-                      { src: projectKidstogether, alt: "Kids2gether", url: "https://www.kids2gether.com.br/" },
-                      { src: projectMeiodomato, alt: "Meio do Mato Eventos", url: "https://lp.meiodomato.com.br/" },
-                      { src: projectServitec, alt: "Servitec Dinamômetro", url: "https://www.servitecdinamometro.com.br/" },
-                    ];
-                    // Duplicar sequência para loop suave
+                    const baseImages = projetosOrdenados.map((p) => ({ id: p.id, src: p.imagem, alt: p.titulo, url: p.url || "/portfolio" }));
                     const sequence = [...baseImages, ...baseImages];
-                    return Array.from({ length: 4 }).flatMap((_, setIndex) =>
+                    return Array.from({ length: 2 }).flatMap((_, setIndex) =>
                       sequence.map((img, i) => (
                         <div key={`set${setIndex}-${i}`} className="carousel-item">
                           <a
@@ -237,15 +90,17 @@ const HeroSection = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label={`Abrir site ${img.alt} em nova aba`}
+                            onClick={() => registrarCliqueProjeto(img.id)}
                             className="block w-full h-full"
                           >
                             <img
                               src={img.src}
-                              alt={setIndex === 0 ? img.alt : ""}
+                              alt={setIndex === 0 && i < baseImages.length ? img.alt : ""}
                               loading="lazy"
+                              decoding="async"
                               className="w-full h-full object-cover"
                               onError={(e) => {
-                                (e.currentTarget as HTMLImageElement).style.opacity = '0.3';
+                                (e.currentTarget as HTMLImageElement).style.opacity = "0.3";
                               }}
                             />
                           </a>
@@ -255,13 +110,6 @@ const HeroSection = () => {
                   })()}
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Animated Text Section */}
-          <div className="text-reveal mt-16 mb-12 sm:mb-20 text-center px-4 sm:px-6">
-            <div className="max-w-4xl mx-auto">
-              <TypewriterText />
             </div>
           </div>
         </div>

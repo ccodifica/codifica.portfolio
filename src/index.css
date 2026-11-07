@@ -1006,6 +1006,37 @@
   }
 }
 
+/* Brilho que atravessa o selo da Black Friday */
+@keyframes brilho-bf {
+  0%, 60% { transform: translateX(0) skewX(-20deg); }
+  100% { transform: translateX(400%) skewX(-20deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [class*="brilho-bf"] { animation: none !important; }
+}
+
+/* Troca de página: o conteúdo novo entra com um fade curto (o topo fica parado) */
+@keyframes pagina-entra {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+#root main {
+  animation: pagina-entra 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #root main { animation: none; }
+}
+
+/* Impressão do recibo: só a área marcada aparece no papel/PDF */
+@media print {
+  body * { visibility: hidden !important; }
+  .area-impressao, .area-impressao * { visibility: visible !important; color: #111 !important; }
+  .area-impressao { position: fixed; inset: 0; padding: 32px; background: #fff; }
+}
+
 /* Keyframe global usado em animations inline (style={{ animation: ... }}) */
 @keyframes fadeInTimelineItem {
   from {

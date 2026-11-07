@@ -28,6 +28,10 @@ interface AuthContextValue {
     ramo?: string;
   }) => Promise<User>;
   logout: () => Promise<void>;
+  /** Envia o código de 6 dígitos para o e-mail (cria o acesso no primeiro uso). */
+  enviarCodigo: (email: string) => Promise<void>;
+  /** Confere o código e abre a sessão. */
+  entrarComCodigo: (email: string, codigo: string) => Promise<User>;
   requestPasswordReset: (email: string) => Promise<void>;
   reloadUser: () => Promise<void>;
 }
@@ -205,6 +209,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setSession(null);
   }, []);
 
+  const enviarCodigo = useCallback(async (email: string) => {
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.trim().toLowerCase(),
+      options: { shouldCreateUser: true, emailRedirectTo: `${window.location.origin}/entrar` },
+    });
+    if (error) {
+      const m = error.message.toLowerCase();
+      throw new Error(
+        m.includes("rate") || m.includes("seconds")
+          ? "Aguarde um pouco antes de pedir outro código."
+          : "Não conseguimos enviar o código. Confira o e-mail e tente de novo."
+      );
+    }
+  }, []);
+
+  const entrarComCodigo = useCallback(async (email: string, codigo: string) => {
+    const { data, error } = await supabase.auth.verifyOtp({
+      email: email.trim().toLowerCase(),
+      token: codigo.replace(/\D/g, ""),
+      type: "email",
+    });
+    if (error || !data.user) {
+      throw new Error(
+        error?.message.toLowerCase().includes("expired")
+          ? "Esse código expirou. Peça um novo."
+          : "Código incorreto. Confira e tente de novo."
+      );
+    }
+    const profile = await fetchProfileWithRetry(data.user.id);
+    if (!profile) throw new Error("Não conseguimos carregar seu acesso. Tente de novo.");
+    setUser(profile);
+    setSession(data.session);
+    return profile;
+  }, []);
+
   const requestPasswordReset = useCallback(async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: resetPasswordRedirect(),
@@ -227,10 +266,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       login,
       register,
       logout,
+      enviarCodigo,
+      entrarComCodigo,
       requestPasswordReset,
       reloadUser,
     }),
     [
+      enviarCodigo,
+      entrarComCodigo,
       user,
       session,
       isLoading,

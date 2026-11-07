@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="x-apple-disable-message-reformatting">
+  <title>Seu código de acesso</title>
+</head>
+<!-- Usado em Authentication > Emails > "Magic Link" E "Confirm signup" (login sem senha por código). -->
+<body style="margin:0; padding:0; background-color:#F4F5F8; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Helvetica, Arial, sans-serif;">
+  <span style="display:none; visibility:hidden; opacity:0; overflow:hidden; mso-hide:all; max-height:0; max-width:0; font-size:1px; line-height:1px;">Seu código de acesso à Codifica: {{ .Token }}</span>
+  <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color:#F4F5F8; padding:40px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" style="max-width:520px; background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 8px 32px rgba(15,23,42,0.06);" border="0" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="background:linear-gradient(135deg, #8B3DF5 0%, #00BFFF 100%); padding:36px 32px; text-align:center;">
+              <div style="font-size:28px; font-weight:800; color:#ffffff; letter-spacing:-0.5px; line-height:1;">Codifica</div>
+              <div style="margin-top:8px; font-size:13px; color:rgba(255,255,255,0.85); font-weight:500;">Área do cliente</div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:36px 36px 8px; text-align:center;">
+              <h1 style="margin:0 0 12px; font-size:22px; font-weight:700; color:#0F172A; line-height:1.3;">Seu código de acesso</h1>
+              <p style="margin:0 0 24px; font-size:15px; line-height:1.6; color:#475569;">
+                Digite este código na tela de entrada do site da Codifica:
+              </p>
+              <div style="display:inline-block; padding:16px 28px; background:#F1F5F9; border-radius:12px; font-size:34px; font-weight:800; letter-spacing:10px; color:#0F172A; font-family:'SF Mono', Menlo, Consolas, monospace;">{{ .Token }}</div>
+              <p style="margin:24px 0 0; font-size:13px; line-height:1.55; color:#64748B;">
+                O código vale por 1 hora e só pode ser usado uma vez.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:16px 36px 32px;">
+              <hr style="margin:20px 0; border:0; border-top:1px solid #E2E8F0;">
+              <p style="margin:0; font-size:13px; line-height:1.6; color:#94A3B8; text-align:center;">
+                Não pediu este código? Pode ignorar este e-mail. Ninguém entra na sua área sem ele.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="background:#F8FAFC; padding:20px 36px; text-align:center; border-top:1px solid #E2E8F0;">
+              <p style="margin:0 0 4px; font-size:14px; font-weight:700; color:#0F172A;">Codifica</p>
+              <p style="margin:0; font-size:11px; color:#94A3B8;">Rio de Janeiro · Brasil</p>
+            </td>
+          </tr>
+        </table>
+        <p style="margin:20px 0 0; font-size:11px; color:#94A3B8;">E-mail automático. Não precisa responder.</p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

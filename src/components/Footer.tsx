@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { CONTRATADA, WHATSAPP_CODIFICA } from "@/config/oferta";
 import {
   Code,
   Mail,
@@ -39,8 +40,8 @@ const Footer = () => {
               <span className="hero-text">Codifica</span>
             </Link>
             <p className="text-muted-foreground mb-6 max-w-md leading-relaxed">
-              Desenvolvemos soluções inteligentes em software para transformar
-              ideias em resultados. Seu parceiro tecnológico para o futuro.
+              Sites e Perfil do Google para negócios locais, e sistemas sob medida para quem precisa de mais. Feito no Rio
+              de Janeiro, direto com quem desenvolve.
             </p>
 
             {/* Contact Info */}
@@ -58,7 +59,7 @@ const Footer = () => {
                 <WhatsAppIcon className="w-5 h-5 text-primary" />
                 <button
                   onClick={() => {
-                    const phoneNumber = "5521982998010"; // +55 21 98299-8010
+                    const phoneNumber = WHATSAPP_CODIFICA;
                     const message = encodeURIComponent("Olá! Gostaria de saber mais sobre os serviços da Codifica.");
                     window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
                   }}
@@ -84,7 +85,15 @@ const Footer = () => {
                   onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                   className="text-muted-foreground hover:text-primary transition-colors duration-300 link-underline"
                 >
-                  Home
+                  Início
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/presenca-no-google"
+                  className="text-muted-foreground hover:text-primary transition-colors duration-300 link-underline"
+                >
+                  Site + Google
                 </Link>
               </li>
               <li>
@@ -112,11 +121,26 @@ const Footer = () => {
           <div>
             <h3 className="font-semibold text-foreground mb-4">Serviços</h3>
             <ul className="space-y-3">
-              <li className="text-muted-foreground">Desenvolvimento Web</li>
-              <li className="text-muted-foreground">Apps Mobile</li>
-              <li className="text-muted-foreground">Sistemas Internos</li>
-              <li className="text-muted-foreground">Integrações</li>
-              <li className="text-muted-foreground">Consultoria</li>
+              {[
+                { to: "/presenca-no-google", rotulo: "Site + Perfil do Google" },
+                { to: "/como-funciona", rotulo: "Como funciona" },
+                { to: "/contrato", rotulo: "Contrato" },
+              ].map((l) => (
+                <li key={l.to}>
+                  <Link to={l.to} className="text-muted-foreground hover:text-primary transition-colors duration-300 link-underline">
+                    {l.rotulo}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link
+                  to="/"
+                  state={{ target: "contact" }}
+                  className="text-muted-foreground hover:text-primary transition-colors duration-300 link-underline"
+                >
+                  Sistemas sob medida
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
@@ -125,6 +149,12 @@ const Footer = () => {
         <div className="border-t border-border/50 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-muted-foreground text-sm text-center md:text-left">
             © {currentYear} Codifica. Todos os direitos reservados.
+            {CONTRATADA.cnpj && (
+              <>
+                <br />
+                {CONTRATADA.razaoSocial ? `${CONTRATADA.razaoSocial} · ` : ""}CNPJ {CONTRATADA.cnpj}
+              </>
+            )}
           </p>
 
           <div className="flex space-x-6 order-3 md:order-2">

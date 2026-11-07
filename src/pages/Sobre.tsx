@@ -4,6 +4,9 @@ import { Link, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TechCarousel from "@/components/TechCarousel";
+import { registrar } from "@/lib/metricas";
+import fotoGustavo from "@/assets/fundador-gustavo.jpg";
+import fotoPedro from "@/assets/fundador-pedro.jpg";
 
 const Sobre = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -60,44 +63,37 @@ const Sobre = () => {
 
   const timelineData = [
     {
-      date: "Janeiro 2025",
-      title: "A Ideia Nasce",
-      description: "Gustavo e Pedro, dois desenvolvedores apaixonados por tecnologia, decidem unir forças para criar algo extraordinário. Nasce a Codifica com uma missão clara: transformar ideias em soluções digitais que fazem a diferença.",
+      date: "O começo",
+      title: "Gustavo e Pedro fundam a Codifica",
+      description: "Dois desenvolvedores do Rio de Janeiro decidem atender negócios que precisam de presença digital, mas não sabem por onde começar nem querem lidar com agência grande.",
       icon: Lightbulb,
       highlight: true,
       founders: true,
-      content: "A fundação da Codifica marca o início de uma jornada focada em inovação e excelência técnica."
+      content: ""
     },
     {
-      date: "Março 2025",
-      title: "Primeiros Passos",
-      description: "Desenvolvemos nossos primeiros projetos focados em sites institucionais e pequenos sistemas web. Cada linha de código é cuidadosamente pensada para estabelecer nossa metodologia de trabalho e padrões de qualidade.",
+      date: "Primeiros projetos",
+      title: "Os primeiros clientes",
+      description: "Sites para empresas de verdade, como a Consultec (topografia e projetos agrícolas) e o Meio do Mato (espaço de eventos), e os primeiros sistemas sob medida.",
       icon: Rocket,
-      content: "Nossa abordagem desde o início: trabalhar lado a lado com nossos clientes, entendendo suas necessidades e criando soluções personalizadas."
+      content: ""
     },
     {
-      date: "Junho 2025",
-      title: "Expansão e Crescimento",
-      description: "Ampliamos nosso portfólio para incluir e-commerces complexos, sistemas de gestão empresarial e aplicações web avançadas. Nossa expertise técnica se consolida com metodologias ágeis e tecnologias modernas.",
-      icon: TrendingUp,
-      content: "Utilizamos as tecnologias mais modernas do mercado - React, Node.js, TypeScript - sempre buscando entregar soluções escaláveis e seguras."
-    },
-    {
-      date: "Setembro 2025",
-      title: "Crescimento Constante",
-      description: "Estamos mais estabilizados no mercado e felizes em receber cada vez mais projetos. Nossa base de clientes cresce organicamente através de recomendações e parcerias sólidas que construímos ao longo do caminho.",
+      date: "Julho 2026",
+      title: "Site + Perfil do Google",
+      description: "Começamos o Site + Perfil do Google, um pacote fechado para negócios locais: prévia grátis em horas, preço sem surpresa e acompanhamento de cada etapa pela área do cliente.",
       icon: Star,
       highlight: true,
-      content: "Cada novo projeto é uma oportunidade de aprender, crescer e entregar ainda mais valor. Estamos construindo algo sólido, passo a passo, com muito trabalho e dedicação."
+      content: ""
     }
   ];
 
   const values = [
     {
       icon: Lightbulb,
-      title: "Inovação Criativa",
-      description: "Transformamos ideias em soluções tecnológicas únicas",
-      detail: "Utilizamos as tecnologias mais modernas para criar experiências que fazem a diferença no mercado.",
+      title: "Você vê antes de pagar",
+      description: "Prévia grátis antes de qualquer cobrança",
+      detail: "Ninguém compra site no escuro. Mostramos como vai ficar e você decide se segue.",
       pattern: "dots",
       color: {
         primary: "amber",
@@ -108,9 +104,9 @@ const Sobre = () => {
     },
     {
       icon: Award,
-      title: "Qualidade Premium", 
-      description: "Excelência em cada detalhe do desenvolvimento",
-      detail: "Cada linha de código é cuidadosamente pensada e testada para entregar o melhor resultado possível.",
+      title: "Preço fechado",
+      description: "Sem surpresa no meio do caminho",
+      detail: "O valor, o prazo e o que está ou não incluído ficam escritos antes de começar.",
       pattern: "waves",
       color: {
         primary: "blue",
@@ -121,9 +117,9 @@ const Sobre = () => {
     },
     {
       icon: Users,
-      title: "Parceria Genuína",
-      description: "Relacionamentos duradouros baseados em confiança",
-      detail: "Trabalhamos lado a lado com nossos clientes, entendendo suas necessidades e objetivos únicos.",
+      title: "Fala direto com quem faz",
+      description: "Sem intermediário e sem atendente",
+      detail: "Quem responde no WhatsApp é quem desenvolve o seu site ou sistema.",
       pattern: "grid",
       color: {
         primary: "emerald",
@@ -134,9 +130,9 @@ const Sobre = () => {
     },
     {
       icon: TrendingUp,
-      title: "Crescimento Contínuo",
-      description: "Evolução constante em tecnologia e metodologia",
-      detail: "Adotamos as melhores práticas e metodologias ágeis para garantir entregas rápidas e eficientes.",
+      title: "Depois da entrega",
+      description: "O site não fica abandonado",
+      detail: "Com a manutenção, cuidamos do site e do seu Perfil do Google todo mês. Sem ela, entregamos tudo na sua mão.",
       pattern: "circles",
       color: {
         primary: "rose",
@@ -148,8 +144,9 @@ const Sobre = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-clip">
       <Header />
+      <main>
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,_hsl(262_100%_58%_/_0.1),_transparent_50%)] animate-pulse" />
@@ -167,8 +164,8 @@ const Sobre = () => {
               Sobre a<span className="text-primary"> Codifica</span>
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto text-balance leading-relaxed">
-              Transformamos ideias em soluções digitais inovadoras, construindo
-              o futuro através da tecnologia.
+              Sites e sistemas para negócios locais, feitos por quem você
+              conhece e com quem fala direto.
             </p>
           </div>
         </div>
@@ -187,7 +184,7 @@ const Sobre = () => {
                 className="absolute left-8 md:left-1/2 md:-translate-x-0.5 top-0 w-1 rounded-full overflow-hidden"
                 style={{
                   height: visibleItems.length > 0 
-                    ? `${(Math.max(...visibleItems) + 1) * 25}%` 
+                    ? `${(Math.max(...visibleItems) + 1) * (100 / timelineData.length)}%`
                     : '0%',
                   transition: 'height 1.5s cubic-bezier(0.4, 0, 0.2, 1)'
                 }}
@@ -222,7 +219,7 @@ const Sobre = () => {
                 <div 
                   className="absolute left-8 md:left-1/2 md:-translate-x-1/2 w-4 h-4 bg-primary rounded-full shadow-lg shadow-primary/50 transition-all duration-1000 ease-out"
                   style={{
-                    top: `${(Math.max(...visibleItems) + 1) * 25}%`,
+                    top: `${(Math.max(...visibleItems) + 1) * (100 / timelineData.length)}%`,
                     transform: 'translateX(-50%) translateY(-50%)'
                   }}
                 >
@@ -349,12 +346,12 @@ const Sobre = () => {
                                   {/* Photo placeholder with sophisticated design */}
                                   <div className="relative mx-auto mb-4">
                                     <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-accent/20 border-3 border-primary/30 flex items-center justify-center hover:scale-110 transition-transform duration-300 shadow-xl group-hover/founder:shadow-2xl group-hover/founder:shadow-primary/20 relative overflow-hidden">
-                                      {/* Photo placeholder */}
-                                      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center relative">
-                                        <span className="text-xl font-bold text-primary">G</span>
-                                        {/* Overlay for future photo */}
-                                        <div className="absolute inset-0 bg-black/10 rounded-full"></div>
-                                      </div>
+                                      <img
+                                        src={fotoGustavo}
+                                        alt="Gustavo, cofundador da Codifica"
+                                        className="w-20 h-20 rounded-full object-cover relative"
+                                        loading="lazy"
+                                      />
                                       {/* Animated border */}
                                       <div className="absolute inset-0 border-2 border-primary/20 rounded-full animate-spin-slow"></div>
                                     </div>
@@ -388,12 +385,12 @@ const Sobre = () => {
                                   {/* Photo placeholder with sophisticated design */}
                                   <div className="relative mx-auto mb-4">
                                     <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-accent/20 to-primary/20 border-3 border-accent/30 flex items-center justify-center hover:scale-110 transition-transform duration-300 shadow-xl group-hover/founder:shadow-2xl group-hover/founder:shadow-accent/20 relative overflow-hidden">
-                                      {/* Photo placeholder */}
-                                      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-accent/30 to-primary/30 flex items-center justify-center relative">
-                                        <span className="text-xl font-bold text-primary">P</span>
-                                        {/* Overlay for future photo */}
-                                        <div className="absolute inset-0 bg-black/10 rounded-full"></div>
-                                      </div>
+                                      <img
+                                        src={fotoPedro}
+                                        alt="Pedro Henrique, cofundador da Codifica"
+                                        className="w-20 h-20 rounded-full object-cover relative"
+                                        loading="lazy"
+                                      />
                                       {/* Animated border */}
                                       <div className="absolute inset-0 border-2 border-accent/20 rounded-full animate-spin-slow"></div>
                                     </div>
@@ -431,6 +428,7 @@ const Sobre = () => {
                           </div>
 
                           {/* Content Section */}
+                          {item.content && (
                           <div className={`relative z-10 px-6 pb-6 transition-all duration-700 ${
                             visibleItems.includes(index) ? 'animate-content-fade-in' : 'opacity-0 translate-y-2'
                           }`}>
@@ -440,6 +438,7 @@ const Sobre = () => {
                               </p>
                             </div>
                           </div>
+                          )}
 
                           {/* Decorative Elements */}
                           <div className="absolute top-4 right-4 w-2 h-2 bg-primary/30 rounded-full animate-pulse"></div>
@@ -497,6 +496,7 @@ const Sobre = () => {
                         </p>
 
                         {/* Content */}
+                        {item.content && (
                         <div className={`bg-card/30 p-3 rounded-lg border border-border/30 relative z-10 transition-all duration-700 ${
                           visibleItems.includes(index) ? 'animate-content-fade-in' : 'opacity-0 translate-y-2'
                         }`}>
@@ -504,6 +504,7 @@ const Sobre = () => {
                             {item.content}
                           </p>
                         </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -512,33 +513,6 @@ const Sobre = () => {
             </div>
           </div>
 
-          {/* Final Stats Summary */}
-          <div className="mt-20 text-center">
-            <div className="max-w-4xl mx-auto">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div className="p-6 bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl border border-primary/20 hover:shadow-lg transition-all duration-300">
-                  <Users className="w-8 h-8 text-primary mx-auto mb-4" />
-                  <div className="text-3xl font-bold text-primary mb-2">25+</div>
-                  <div className="text-sm text-muted-foreground font-medium">Projetos Entregues</div>
-                </div>
-                <div className="p-6 bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl border border-primary/20 hover:shadow-lg transition-all duration-300">
-                  <Target className="w-8 h-8 text-primary mx-auto mb-4" />
-                  <div className="text-3xl font-bold text-primary mb-2">100%</div>
-                  <div className="text-sm text-muted-foreground font-medium">Satisfação</div>
-                </div>
-                <div className="p-6 bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl border border-primary/20 hover:shadow-lg transition-all duration-300">
-                  <Award className="w-8 h-8 text-primary mx-auto mb-4" />
-                  <div className="text-3xl font-bold text-primary mb-2">2+</div>
-                  <div className="text-sm text-muted-foreground font-medium">Anos Experiência</div>
-                </div>
-                <div className="p-6 bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl border border-primary/20 hover:shadow-lg transition-all duration-300">
-                  <Code2 className="w-8 h-8 text-primary mx-auto mb-4" />
-                  <div className="text-3xl font-bold text-primary mb-2">24/7</div>
-                  <div className="text-sm text-muted-foreground font-medium">Suporte Técnico</div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -550,10 +524,9 @@ const Sobre = () => {
               Nossa Missão
             </h2>
             <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-              Na Codifica, acreditamos que a tecnologia deve ser uma ferramenta
-              de transformação. Nossa missão é desenvolver soluções digitais que
-              não apenas atendam às necessidades dos nossos clientes, mas que
-              também impulsionem o crescimento e a inovação em seus negócios.
+              Fazer o negócio local ser encontrado e escolhido na internet, sem
+              complicação: preço fechado, prazo curto, conversa direta e um site
+              que continua funcionando depois da entrega.
             </p>
           </div>
         </div>
@@ -706,12 +679,9 @@ const Sobre = () => {
               empresa a alcançar o próximo nível através da tecnologia.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button 
-                onClick={handleContactClick}
-                className="btn-sweep-right"
-              >
-                Fale Conosco
-              </button>
+              <Link to="/presenca-no-google" onClick={() => registrar("clique_comecar", "quero_meu_site_sobre")} className="btn-sweep-right text-center">
+                Quero meu site
+              </Link>
               <Link 
                 to="/portfolio"
                 onClick={() => {
@@ -727,6 +697,7 @@ const Sobre = () => {
           </div>
         </div>
       </section>
+      </main>
       <Footer />
     </div>
   );
