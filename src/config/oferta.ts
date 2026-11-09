@@ -280,7 +280,7 @@ export const PERGUNTAS = [
 ];
 
 /** Vídeo "Como funciona" (hospedado no próprio site, em public/video). Vazio = não mostra o bloco. */
-export const VIDEO_COMO_FUNCIONA = { src: "/video/como-funciona.mp4", capa: "/video/como-funciona-capa.webp", duracao: "1:17" };
+export const VIDEO_COMO_FUNCIONA = { src: "/video/como-funciona.mp4", capa: "/video/como-funciona-capa.webp", duracao: "1:18" };
 
 /** Quem faz o site. Foto fica para depois; por enquanto, link do LinkedIn (vazio = sem botão). */
 export const EQUIPE = [
