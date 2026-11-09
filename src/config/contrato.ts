@@ -5,9 +5,9 @@ import { BLACK_FRIDAY, CARTAO, CONTRATADA, OFERTA, RODADAS, brl } from "./oferta
  * Versão final publicada em 07/11/2026 (revisão de advogado ainda recomendada).
  * Toda alteração de texto deve subir a versão: o aceite grava a versão aceita.
  */
-export const CONTRATO_VERSAO = "1.3";
+export const CONTRATO_VERSAO = "1.4";
 export const CONTRATO_RASCUNHO = false;
-export const CONTRATO_DATA = "07/11/2026";
+export const CONTRATO_DATA = "08/11/2026";
 
 export interface Clausula {
   titulo: string;
@@ -52,6 +52,8 @@ export const CLAUSULAS: Clausula[] = [
       `Durante a promoção de Black Friday, até ${new Date(BLACK_FRIDAY.ate).toLocaleDateString("pt-BR")}, a implantação sai por ${brl(BLACK_FRIDAY.precoPix)} no Pix ou boleto, ou ${brl(BLACK_FRIDAY.precoCartao)} no cartão, nas mesmas condições de parcelamento. Vale o preço do dia do aceite.`,
       `O site completo é entregue em até ${OFERTA.prazoEntregaDias} dias corridos após a confirmação do pagamento. Pagamentos por boleto são considerados confirmados na compensação.`,
       "O prazo fica suspenso enquanto a CONTRATADA aguarda informação ou aprovação do CONTRATANTE.",
+      "O Perfil da Empresa no Google é configurado dentro do prazo do site. A verificação e a exibição do Perfil são feitas pelo próprio Google, que escolhe o método (vídeo, ligação, e-mail ou carta) e o tempo de análise. A CONTRATADA não controla nem garante esse prazo. Se o CONTRATANTE já tiver Perfil verificado e der acesso de administrador à CONTRATADA, as alterações são enviadas dentro do prazo do site e o Google costuma exibi-las em poucos dias.",
+      "Quando o Google pedir uma etapa que só o CONTRATANTE pode fazer, como gravar um vídeo do local ou informar um código recebido, a CONTRATADA orienta o passo a passo, e essa etapa não conta no prazo do site.",
     ],
   },
   {

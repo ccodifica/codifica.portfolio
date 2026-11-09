@@ -301,6 +301,34 @@ const ComoFunciona = () => (
       </ol>
     </Secao>
 
+    <Secao titulo="Sobre o prazo do Perfil do Google" id="perfil-google">
+      <Cartao className="border-primary/40">
+        <p className="text-foreground/90 mb-5 max-w-3xl">
+          O site fica pronto em até 1 semana. O Perfil do Google a gente configura nessa mesma semana, mas quem decide
+          quando ele aparece é o Google. Funciona assim:
+        </p>
+        <div className="grid md:grid-cols-2 gap-4 mb-5">
+          <div className="rounded-xl border border-border bg-background/40 p-4">
+            <p className="font-semibold mb-1">Já tem Perfil verificado</p>
+            <p className="text-sm text-muted-foreground">
+              Você nos dá acesso de administrador e a gente completa tudo. As mudanças costumam aparecer em poucos dias.
+            </p>
+          </div>
+          <div className="rounded-xl border border-border bg-background/40 p-4">
+            <p className="font-semibold mb-1">Ainda não tem Perfil</p>
+            <p className="text-sm text-muted-foreground">
+              A gente cria o Perfil completo e envia para o Google verificar. A verificação costuma levar de alguns dias a 2
+              semanas e pode pedir um vídeo do local ou um código. A gente te guia em cada passo.
+            </p>
+          </div>
+        </div>
+        <p className="text-sm text-muted-foreground max-w-3xl">
+          Esse prazo é do Google, não nosso, e está no contrato. Enquanto o Perfil é verificado, o seu site já está no ar e
+          recebendo contatos.
+        </p>
+      </Cartao>
+    </Secao>
+
     <Secao titulo="O que fazemos e o que não fazemos">
       <div className="grid md:grid-cols-3 gap-6">
         <Cartao>
