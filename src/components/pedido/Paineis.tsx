@@ -862,7 +862,7 @@ export const PainelProducao = ({ pedido, onAtualiza, atual }: Props) => {
     { icone: Hammer, titulo: "Montando o site completo", texto: "Todas as seções, com o seu material." },
     { icone: Globe, titulo: "Completando o Perfil do Google", texto: "Fotos, horário, serviços e link do site." },
     { icone: PenLine, titulo: `Revisão com você (${RODADAS})`, texto: "Antes de publicar, você vê tudo e pede ajustes." },
-    { icone: Sparkles, titulo: "Publicação no ar", texto: "No seu domínio, aparecendo no Google." },
+    { icone: Sparkles, titulo: "Publicação no ar", texto: "No seu domínio, com o botão de WhatsApp funcionando." },
   ];
   return (
     <>

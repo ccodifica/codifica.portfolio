@@ -219,13 +219,19 @@ export const ETAPAS_PROCESSO: EtapaProcesso[] = [
   },
   {
     titulo: `Site completo em até ${PRAZO_SITE}`,
-    texto: `Montamos o site inteiro e o seu Perfil do Google. Antes de publicar, você tem ${RODADAS}.`,
+    texto: `Montamos o site inteiro e deixamos o seu Perfil do Google completo. Antes de publicar, você tem ${RODADAS}.`,
     quem: "juntos",
   },
   {
-    titulo: "No ar",
-    texto: "Site publicado no seu domínio, aparecendo no Google e com o botão de WhatsApp funcionando. O 1º mês de manutenção já está incluso.",
+    titulo: "Site no ar",
+    texto: "Site publicado no seu domínio, com o botão de WhatsApp funcionando. O 1º mês de manutenção já está incluso.",
     quem: "codifica",
+  },
+  {
+    titulo: "Perfil do Google: a parte do Google",
+    texto:
+      "Se o seu negócio já tem Perfil verificado, as mudanças aparecem em poucos dias. Se ainda não tem, a gente cria o Perfil completo e envia para o Google verificar. Quem verifica é o Google, e o prazo é dele: costuma levar de alguns dias a 2 semanas. Às vezes ele pede um vídeo do local ou um código, e a gente te explica o que fazer.",
+    quem: "juntos",
   },
   {
     titulo: "Manutenção opcional",
@@ -254,6 +260,10 @@ export const PERGUNTAS = [
   {
     p: "O domínio e o Perfil do Google ficam com quem?",
     r: "A Codifica cuida de tudo enquanto você tiver a manutenção. Se pedir, transferimos em até 7 dias úteis, sem custo de transferência.",
+  },
+  {
+    p: "Em quanto tempo meu Perfil aparece no Google?",
+    r: "Se você já tem Perfil verificado, as mudanças aparecem em poucos dias. Se ainda não tem, a gente cria e envia para o Google verificar dentro da semana do site, mas a verificação é feita pelo Google e o prazo é dele. Costuma levar de alguns dias a 2 semanas. Se o Google pedir um vídeo do local ou um código, a gente te explica o passo a passo.",
   },
   {
     p: "Vocês garantem primeiro lugar no Google?",
